@@ -11,11 +11,20 @@ With hysteresis to prevent oscillation.
 """
 
 import subprocess
+import re
 import threading
 import time
 import json
 import uuid
+import hashlib
+import secrets
 import logging
+
+try:
+    import websocket as ws_client
+    HAS_WEBSOCKET = True
+except ImportError:
+    HAS_WEBSOCKET = False
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +88,10 @@ class AlertManager:
         # ESP32 serial connection
         self._serial = None
         self._esp32_connected = False
+
+        # KDE Connect resolved device flag/id
+        self._kde_device_flag = None  # e.g. '-n' or '-d'
+        self._kde_device_value = None  # e.g. 'Y18' or UUID
 
         # Channel status (start with defaults, update async)
         self._channel_status = {
@@ -219,29 +232,60 @@ class AlertManager:
 
     # ---- SMS via KDE Connect ----
 
+    def _resolve_kde_device(self):
+        """Resolve KDE Connect device — determine if config has name or UUID."""
+        device_id = self.config['sms'].get('device_id', '')
+        if not device_id:
+            return False
+
+        # UUID pattern: hex chars with underscores or hyphens, length > 16
+        is_uuid = bool(re.match(r'^[a-f0-9_\-]{16,}$', device_id, re.IGNORECASE))
+
+        if is_uuid:
+            self._kde_device_flag = '-d'
+            self._kde_device_value = device_id
+            logger.info(f"KDE Connect: using device UUID '{device_id}'")
+        else:
+            # It's a device name — use -n flag
+            self._kde_device_flag = '-n'
+            self._kde_device_value = device_id
+            logger.info(f"KDE Connect: using device name '{device_id}'")
+
+        return True
+
     def _send_sms(self, message):
         """Send SMS through KDE Connect CLI."""
         try:
-            device_id = self.config['sms']['device_id']
             recipients = self.config['sms']['recipients']
 
-            if not device_id:
-                logger.warning("SMS: KDE Connect device_id not configured")
-                self._channel_status['sms'] = False
-                return
+            if not self._kde_device_flag or not self._kde_device_value:
+                if not self._resolve_kde_device():
+                    logger.warning("SMS: KDE Connect device not configured")
+                    self._channel_status['sms'] = False
+                    return
 
             for number in recipients:
                 cmd = [
                     'kdeconnect-cli',
                     '--send-sms', message,
                     '--destination', number,
-                    '-d', device_id
+                    self._kde_device_flag, self._kde_device_value
                 ]
-                result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
                 if result.returncode == 0:
                     logger.info(f"SMS sent to {number}")
                 else:
-                    logger.error(f"SMS failed to {number}: {result.stderr}")
+                    err = result.stderr.strip()
+                    # If -d failed, try -n as fallback
+                    if self._kde_device_flag == '-d' and 'find device' in err.lower():
+                        logger.warning(f"UUID lookup failed, retrying with device name...")
+                        cmd[5] = '-n'
+                        result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+                        if result.returncode == 0:
+                            self._kde_device_flag = '-n'
+                            logger.info(f"SMS sent to {number} (via name fallback)")
+                            continue
+                    logger.error(f"SMS failed to {number}: {err}")
 
             self._last_alert_time['sms'] = time.time()
             self._channel_status['sms'] = True
@@ -249,23 +293,27 @@ class AlertManager:
         except FileNotFoundError:
             logger.error("kdeconnect-cli not found — install KDE Connect")
             self._channel_status['sms'] = False
+        except subprocess.TimeoutExpired:
+            logger.error("SMS send timed out — is the phone reachable?")
         except Exception as e:
             logger.error(f"SMS error: {e}")
             self._channel_status['sms'] = False
 
     def _init_channels(self):
         """Initialize external channels in background (non-blocking)."""
-        # Check KDE Connect
+        # Check KDE Connect and resolve device
         try:
             result = subprocess.run(
                 ['kdeconnect-cli', '--list-devices'],
-                capture_output=True, text=True, timeout=3
+                capture_output=True, text=True, timeout=5
             )
-            self._channel_status['sms'] = (result.returncode == 0)
             if result.returncode == 0:
-                logger.info("KDE Connect available")
+                logger.info(f"KDE Connect available: {result.stdout.strip()}")
+                self._resolve_kde_device()
+                self._channel_status['sms'] = True
             else:
                 logger.warning("KDE Connect not responding")
+                self._channel_status['sms'] = False
         except (FileNotFoundError, subprocess.TimeoutExpired, Exception) as e:
             logger.warning(f"KDE Connect not available: {e}")
             self._channel_status['sms'] = False
@@ -276,26 +324,96 @@ class AlertManager:
 
     # ---- Nostr for Bitchat ----
 
+    def _get_nostr_privkey(self):
+        """Get or generate a Nostr private key (32-byte hex)."""
+        pk = self.config.get('nostr', {}).get('private_key', '')
+        if not pk or len(pk) < 64:
+            import secrets
+            pk = secrets.token_hex(32)
+            if 'nostr' not in self.config:
+                self.config['nostr'] = {}
+            self.config['nostr']['private_key'] = pk
+            logger.info("Generated new Nostr private key (saved to config)")
+            # Save key
+            try:
+                import yaml
+                with open('config.yaml', 'w') as f:
+                    yaml.dump(self.config, f, default_flow_style=False)
+            except Exception:
+                pass
+        return pk
+
     def _send_nostr(self, message, level, water_level_cm):
         """Publish alert to Nostr relays for Bitchat pickup."""
+        if not HAS_WEBSOCKET:
+            logger.warning("Nostr: websocket-client not installed, skipping")
+            self._channel_status['nostr'] = False
+            return
+            
         try:
-            # Build a simple Nostr-compatible event
-            # Using a direct HTTP approach to avoid heavy dependencies
-            event_data = {
-                'type': 'flood_alert',
-                'level': LEVEL_NAMES[level],
-                'water_level_cm': water_level_cm,
-                'message': message,
-                'timestamp': int(time.time())
+            from nostr.event import Event
+            from nostr.key import PrivateKey
+        except ImportError:
+            logger.warning("Nostr: python-nostr not installed, please pip install nostr")
+            self._channel_status['nostr'] = False
+            return
+
+        try:
+            privkey_hex = self._get_nostr_privkey()
+            pk = PrivateKey(bytes.fromhex(privkey_hex))
+            pubkey = pk.public_key.hex()
+
+            created_at = int(time.time())
+            # kind 1 text note
+            tags = [
+                ["t", "flood_alert"],
+                ["t", "hydroguard"],
+                ["level", LEVEL_NAMES[level]],
+                ["water_cm", str(int(water_level_cm))]
+            ]
+            content = f"🌊 HYDROGUARD FLOOD ALERT [{LEVEL_NAMES[level]}]\n\nWater level: {water_level_cm:.0f} cm\n{message}"
+
+            event = Event(public_key=pubkey, content=content, kind=1, created_at=created_at, tags=tags)
+            pk.sign_event(event)
+
+            # Manually extract Enum value if python-nostr uses Enums for EventKind
+            kind_val = event.kind.value if hasattr(event.kind, 'value') else event.kind
+            
+            event_dict = {
+                "id": event.id,
+                "pubkey": event.public_key,
+                "created_at": event.created_at,
+                "kind": kind_val,
+                "tags": event.tags,
+                "content": event.content,
+                "sig": event.signature
             }
 
-            # For now, log the event — full Nostr integration requires key management
-            logger.info(f"Nostr event prepared: {json.dumps(event_data)}")
-            # TODO: Sign and publish to relays when nostr keys are configured
-            # This would use websocket connection to relay URLs in config
+            relay_msg = json.dumps(["EVENT", event_dict])
+            relays = self.config.get('nostr', {}).get('relays', [])
+
+            success_count = 0
+            for relay_url in relays:
+                try:
+                    ws = ws_client.create_connection(relay_url, timeout=5)
+                    ws.send(relay_msg)
+                    try:
+                        resp = ws.recv()
+                        logger.info(f"Nostr relay {relay_url}: {resp[:120]}")
+                    except Exception:
+                        pass
+                    ws.close()
+                    success_count += 1
+                except Exception as e:
+                    logger.warning(f"Nostr relay {relay_url} failed: {e}")
+
+            if success_count > 0:
+                logger.info(f"Nostr event published to {success_count}/{len(relays)} relays")
+            else:
+                logger.warning("Nostr: failed to reach any relay")
 
             self._last_alert_time['nostr'] = time.time()
-            self._channel_status['nostr'] = True
+            self._channel_status['nostr'] = success_count > 0
 
         except Exception as e:
             logger.error(f"Nostr error: {e}")

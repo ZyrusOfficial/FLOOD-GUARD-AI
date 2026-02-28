@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OLED Stream Player - Full Screen</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#d41142",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#120a0c", 
+                        "oled-black": "#000000",
+                        "surface-dark": "#221015",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px" },
+                    boxShadow: {
+                        "ambilight": "0 0 120px -20px rgba(212, 17, 66, 0.4)",
+                        "glow": "0 0 20px rgba(212, 17, 66, 0.6)"
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #120a0c; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333; 
+            border-radius: 4px;
+        }
+        .material-symbols-outlined {font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }.glass-panel {
+            background: rgba(0, 0, 0, 0.3);backdrop-filter: blur(8px);-webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.5);
+        }
+        .player-ui {
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .group\/player:hover .player-ui {
+            opacity: 1;
+            transform: translateY(0);
+        }.progress-comet {
+            box-shadow: 0 0 8px 1px rgba(212, 17, 66, 0.8), -15px 0 25px 0px rgba(212, 17, 66, 0.4);
+        }
+</style>
+</head>
+<body class="bg-oled-black font-display text-white antialiased overflow-hidden h-screen w-screen">
+<div class="relative w-full h-full group/player bg-black select-none">
+<div class="absolute inset-0 z-0 overflow-hidden">
+<div class="absolute -inset-[10%] bg-primary/20 blur-[120px] opacity-20 rounded-[50%] animate-pulse"></div>
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-[20s] ease-linear hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDe_IedqMDhpLKmf3aFoYcvFmZHhD5qIPtR_EJMxQUn6f86I8He3bnqTADWq4Pd8qTcqJYnF_heL8KbLafGRsInpeFlU5fp7F1f2dng66WjHnvKnzS2pKLCnzsToHyo0o_JYOZnnmvSWMutrSqORnP9FG1YSqb3EyLNDICQxquVweopOTw9TCnTc8tSIXPGJlXW0Ozn4NQZDxqbsHs_UbFwMTAC9woPMhoinu7xIEE2wC-IcwUfU7EGWS03G_GvPJNpyLq6Gx-hqTw');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/80 pointer-events-none"></div>
+</div>
+<div class="absolute top-0 left-0 p-10 z-50 player-ui opacity-0 -translate-y-4 transition-all duration-500 delay-75">
+<h1 class="text-3xl font-light tracking-tight text-white/95 drop-shadow-lg mb-2">Cyberpunk: Edgerunners</h1>
+<div class="flex items-center gap-3 text-white/60 text-xs font-light tracking-widest uppercase">
+<span class="border border-white/10 rounded px-1.5 py-0.5 bg-black/40 backdrop-blur-md">TV-MA</span>
+<span>S1:E4</span>
+<span class="w-0.5 h-3 bg-white/20"></span>
+<span>Lucky You</span>
+</div>
+</div>
+<div class="absolute top-0 right-0 p-8 z-50 flex items-center gap-4 player-ui opacity-0 -translate-y-4 transition-all duration-500 delay-75">
+<button class="group/close relative p-3 rounded-full hover:bg-white/5 transition-all text-white/70 hover:text-white" title="Close Player">
+<span class="material-symbols-outlined text-3xl font-light">close</span>
+</button>
+</div>
+<div class="absolute bottom-0 inset-x-0 z-50 p-8 pb-10 player-ui opacity-0 translate-y-4 transition-all duration-500 delay-100 bg-gradient-to-t from-black via-black/90 to-transparent">
+<div class="absolute bottom-28 right-10 z-[60]">
+<button class="glass-panel pl-5 pr-2 py-1.5 rounded-full flex items-center gap-4 hover:bg-white/5 transition-all group/next hover:border-white/20 hover:shadow-glow">
+<div class="flex flex-col items-end">
+<span class="text-[9px] uppercase tracking-widest text-white/50 font-medium">Up Next</span>
+<span class="text-sm font-mono font-medium text-white/90 group-hover/next:text-primary transition-colors">00:05</span>
+</div>
+<div class="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center group-hover/next:bg-primary group-hover/next:text-white transition-all border border-white/5 group-hover/next:border-primary">
+<span class="material-symbols-outlined text-xl">skip_next</span>
+</div>
+</button>
+</div>
+<div class="w-full max-w-6xl mx-auto flex flex-col gap-2">
+<div class="flex items-center gap-5 group/timeline px-2">
+<span class="text-xs font-mono text-white/50 min-w-[40px] text-right tracking-tight">12:30</span>
+<div class="relative flex-1 h-3 flex items-center cursor-pointer group/bar py-4"> 
+<div class="absolute w-full h-[2px] bg-white/10 rounded-full group-hover/bar:h-[3px] transition-all duration-300 ease-out"></div>
+<div class="absolute h-[2px] w-[60%] bg-white/5 rounded-full group-hover/bar:h-[3px] transition-all duration-300"></div>
+<div class="absolute h-[2px] w-[45%] bg-primary rounded-full group-hover/bar:h-[3px] transition-all duration-300 progress-comet relative">
+<div class="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white rounded-full shadow-[0_0_12px_rgba(255,255,255,0.9)] opacity-0 group-hover/timeline:opacity-100 transition-opacity duration-200 transform scale-0 group-hover/timeline:scale-100"></div>
+</div>
+</div>
+<span class="text-xs font-mono text-white/30 min-w-[40px] tracking-tight">24:45</span>
+</div>
+<div class="glass-panel px-8 py-3 rounded-xl flex items-center justify-between mt-1">
+<div class="flex items-center gap-8">
+<button class="text-white hover:text-primary transition-all duration-300 transform hover:scale-105 active:scale-95">
+<span class="material-symbols-outlined text-5xl font-thin filled drop-shadow-lg">play_circle</span>
+</button>
+<div class="flex items-center gap-4 text-white/50">
+<button class="hover:text-white transition-colors hover:bg-white/5 rounded-full p-2" title="Rewind 10s">
+<span class="material-symbols-outlined text-2xl">replay_10</span>
+</button>
+<button class="hover:text-white transition-colors hover:bg-white/5 rounded-full p-2" title="Forward 10s">
+<span class="material-symbols-outlined text-2xl">forward_10</span>
+</button>
+</div>
+<div class="group/volume flex items-center gap-3 pl-6 border-l border-white/5">
+<button class="text-white/60 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-2xl">volume_up</span>
+</button>
+<div class="w-0 overflow-hidden group-hover/volume:w-24 transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)]">
+<div class="h-[3px] w-20 bg-white/10 rounded-full ml-1 relative cursor-pointer group/vol-track">
+<div class="absolute left-0 top-0 h-full w-2/3 bg-white rounded-full group-hover/vol-track:bg-primary transition-colors shadow-[0_0_10px_rgba(255,255,255,0.2)]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 text-white/50">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors hover:text-white group/quality">
+<span class="material-symbols-outlined text-xl">hd</span>
+<span class="text-[10px] font-bold tracking-widest opacity-60 group-hover/quality:opacity-100 transition-opacity">1080P</span>
+</button>
+<button class="p-2 rounded-full hover:bg-white/5 hover:text-white transition-all" title="Subtitles">
+<span class="material-symbols-outlined text-xl">closed_caption</span>
+</button>
+<button class="p-2 rounded-full hover:bg-white/5 hover:text-white transition-all" title="Settings">
+<span class="material-symbols-outlined text-xl">settings</span>
+</button>
+<button class="p-2 rounded-full hover:bg-white/5 hover:text-white transition-all ml-2" title="Fullscreen">
+<span class="material-symbols-outlined text-xl">fullscreen</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Camera Calibration Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        display: ["Space Grotesk", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px",
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1c1f27; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b4354; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563; 
+        }
+        
+        .drag-line {
+            cursor: ns-resize;
+            transition: opacity 0.2s;
+        }
+        .drag-line:hover {
+            opacity: 1;
+        }
+        .drag-handle {
+            transition: transform 0.2s;
+        }
+        .drag-line:hover .drag-handle {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- Sidebar -->
+<div class="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-[#111318] flex flex-col justify-between">
+<div class="flex flex-col gap-4 p-4">
+<div class="flex gap-3 items-center mb-4">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10" data-alt="Admin user avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA5qiAECvnqgMrV6-AHXRbuSjMAoOEl_SzSVoPAplbSKVD7qQ47gAvgbnGELC5hyrlycA8r2HO9DuO_1Dx8g5cGg2giOS4sAoXGYQWwgnvm9Rcfxy_c-vdoRRz7JFA4PGiv9A3pGsalc-n4bRVqVs37Q00XVnVHPPoe_qtSfFtXfLZV6hwtBBBf5_vd3LwwqIp52eQPDNXCNl2DWdzRpjrLDjlLVLB5EDLClYvOLhHcvMhxN7ZDTvA_8VtvGmEzXtCKl1uyo5bh3sQ1");'></div>
+<div class="flex flex-col">
+<h1 class="text-white text-base font-medium leading-normal">Admin Panel</h1>
+<p class="text-[#9da6b9] text-xs font-normal leading-normal">Water Level Monitor</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-[#9da6b9] group-hover:text-white">dashboard</span>
+<p class="text-[#9da6b9] group-hover:text-white text-sm font-medium leading-normal">Dashboard</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-[#9da6b9] group-hover:text-white">videocam</span>
+<p class="text-[#9da6b9] group-hover:text-white text-sm font-medium leading-normal">Camera Feeds</p>
+</div>
+<!-- Active State -->
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 border-l-2 border-primary">
+<span class="material-symbols-outlined text-primary">filter_center_focus</span>
+<p class="text-white text-sm font-medium leading-normal">Camera Calibration</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-[#9da6b9] group-hover:text-white">description</span>
+<p class="text-[#9da6b9] group-hover:text-white text-sm font-medium leading-normal">Alert Logs</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-[#9da6b9] group-hover:text-white">settings</span>
+<p class="text-[#9da6b9] group-hover:text-white text-sm font-medium leading-normal">System Settings</p>
+</div>
+</div>
+</div>
+<div class="p-4">
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-white/5 hover:bg-white/10 text-white text-sm font-bold leading-normal tracking-[0.015em] transition-colors">
+<span class="truncate">Logout</span>
+</button>
+</div>
+</div>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-background-light dark:bg-background-dark">
+<!-- Header -->
+<header class="flex items-center justify-between px-8 py-5 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111318]">
+<div>
+<h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Calibration Mode</h1>
+<p class="text-sm text-slate-500 dark:text-[#9da6b9]">Adjust threshold lines on the live feed to configure alert levels.</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-xs font-medium border border-emerald-500/20">
+<span class="block size-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Live Feed Active
+                    </span>
+<button class="p-2 text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">refresh</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+</header>
+<!-- Workspace -->
+<div class="flex flex-1 overflow-hidden">
+<!-- Video Canvas Area -->
+<div class="flex-1 p-6 flex flex-col bg-[#0b0e14] relative justify-center items-center overflow-auto">
+<!-- Video Container -->
+<div class="relative w-full max-w-5xl aspect-video bg-black rounded-xl overflow-hidden shadow-2xl ring-1 ring-slate-800 group">
+<!-- Video Placeholder -->
+<div class="absolute inset-0 bg-cover bg-center opacity-80" data-alt="Industrial water tank monitoring camera view" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBvQ-_y7vPYUXjblNrXmQFei4xefCsrUU8k0FqasuSLhhdqba50kRElNQJQmvRpLpcvT9KsB7dXLTpPzZaJn5QPify2DXL6BT6bRgz0cZ4qTCfcrRMcZ2S-UriaH9wWJy_eprWK5z5G8ydDtLIPXyTb7hNtaPv0Ct8e7Rp6a95WQfDzg0LkYeIsBuq-34w4iiS3tJZZshJuk5BC0fiq0-Nj6no1pICkavpdAfiQn13-MktaRFHMlI2_1b-EUiaARHcjrCfUGqfLD8Vx");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<!-- Overlay UI -->
+<div class="absolute top-4 left-4 bg-black/60 backdrop-blur-md text-white px-3 py-1 rounded text-xs font-mono border border-white/10">
+                            CAM-04: MAIN_RESERVOIR
+                        </div>
+<!-- Draggable Lines -->
+<!-- Critical Line (Red) -->
+<div class="absolute w-full flex items-center group/line" style="top: 15%;">
+<div class="w-full h-[2px] bg-red-500/50 group-hover/line:bg-red-500 transition-colors drag-line relative">
+<div class="absolute right-4 -top-3 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm drag-handle select-none cursor-ns-resize">CRITICAL</div>
+<div class="absolute left-0 w-full h-4 -top-2 cursor-ns-resize"></div>
+</div>
+</div>
+<!-- Danger Line (Orange) -->
+<div class="absolute w-full flex items-center group/line" style="top: 30%;">
+<div class="w-full h-[2px] bg-orange-500/50 group-hover/line:bg-orange-500 transition-colors drag-line relative">
+<div class="absolute right-4 -top-3 bg-orange-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm drag-handle select-none cursor-ns-resize">DANGER</div>
+<div class="absolute left-0 w-full h-4 -top-2 cursor-ns-resize"></div>
+</div>
+</div>
+<!-- Warning Line (Yellow) -->
+<div class="absolute w-full flex items-center group/line" style="top: 50%;">
+<div class="w-full h-[2px] bg-yellow-500/50 group-hover/line:bg-yellow-500 transition-colors drag-line relative">
+<div class="absolute right-4 -top-3 bg-yellow-600 text-black text-[10px] font-bold px-2 py-0.5 rounded shadow-sm drag-handle select-none cursor-ns-resize">WARNING</div>
+<div class="absolute left-0 w-full h-4 -top-2 cursor-ns-resize"></div>
+</div>
+</div>
+<!-- Normal Line (Blue/Green) -->
+<div class="absolute w-full flex items-center group/line" style="top: 75%;">
+<div class="w-full h-[2px] bg-emerald-500/50 group-hover/line:bg-emerald-500 transition-colors drag-line relative">
+<div class="absolute right-4 -top-3 bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm drag-handle select-none cursor-ns-resize">NORMAL</div>
+<div class="absolute left-0 w-full h-4 -top-2 cursor-ns-resize"></div>
+</div>
+</div>
+<!-- Play Overlay (Hidden when active, shown here for design) -->
+<div class="absolute bottom-4 left-4 flex gap-2">
+<button class="bg-black/50 hover:bg-black/70 text-white p-2 rounded-lg backdrop-blur-sm transition-all border border-white/10">
+<span class="material-symbols-outlined text-[20px]">pause</span>
+</button>
+<button class="bg-black/50 hover:bg-black/70 text-white p-2 rounded-lg backdrop-blur-sm transition-all border border-white/10">
+<span class="material-symbols-outlined text-[20px]">zoom_in</span>
+</button>
+</div>
+</div>
+<div class="mt-4 flex gap-4 text-xs text-slate-500 font-mono">
+<span>X: 1920px</span>
+<span>Y: 1080px</span>
+<span>FPS: 30</span>
+<span>LATENCY: 24ms</span>
+</div>
+</div>
+<!-- Right Panel: Controls -->
+<div class="w-80 flex-shrink-0 bg-white dark:bg-[#111318] border-l border-slate-200 dark:border-slate-800 flex flex-col">
+<div class="p-6 flex-1 overflow-y-auto">
+<h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-6">Threshold Values</h2>
+<div class="flex flex-col gap-6">
+<!-- Critical Input -->
+<div class="group">
+<label class="flex justify-between text-xs font-medium text-slate-400 mb-2">
+<span class="flex items-center gap-2"><span class="size-2 rounded-full bg-red-500"></span> Critical Level</span>
+<span class="text-red-500 font-mono">Max Fill</span>
+</label>
+<div class="relative">
+<input class="w-full bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded-lg px-3 py-3 text-slate-900 dark:text-white font-mono text-lg focus:ring-2 focus:ring-red-500/50 focus:border-red-500 outline-none transition-all pr-12" type="number" value="450"/>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-medium">cm</span>
+</div>
+<p class="text-[10px] text-slate-500 mt-1">Triggers immediate pump shutdown.</p>
+</div>
+<!-- Danger Input -->
+<div class="group">
+<label class="flex justify-between text-xs font-medium text-slate-400 mb-2">
+<span class="flex items-center gap-2"><span class="size-2 rounded-full bg-orange-500"></span> Danger Level</span>
+<span class="text-orange-500 font-mono">High</span>
+</label>
+<div class="relative">
+<input class="w-full bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded-lg px-3 py-3 text-slate-900 dark:text-white font-mono text-lg focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 outline-none transition-all pr-12" type="number" value="380"/>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-medium">cm</span>
+</div>
+</div>
+<!-- Warning Input -->
+<div class="group">
+<label class="flex justify-between text-xs font-medium text-slate-400 mb-2">
+<span class="flex items-center gap-2"><span class="size-2 rounded-full bg-yellow-500"></span> Warning Level</span>
+<span class="text-yellow-500 font-mono">Alert</span>
+</label>
+<div class="relative">
+<input class="w-full bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded-lg px-3 py-3 text-slate-900 dark:text-white font-mono text-lg focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500 outline-none transition-all pr-12" type="number" value="250"/>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-medium">cm</span>
+</div>
+</div>
+<!-- Normal Input -->
+<div class="group">
+<label class="flex justify-between text-xs font-medium text-slate-400 mb-2">
+<span class="flex items-center gap-2"><span class="size-2 rounded-full bg-emerald-500"></span> Normal Level</span>
+<span class="text-emerald-500 font-mono">Optimal</span>
+</label>
+<div class="relative">
+<input class="w-full bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded-lg px-3 py-3 text-slate-900 dark:text-white font-mono text-lg focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all pr-12" type="number" value="120"/>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-medium">cm</span>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
+<h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4">Sensor Offset</h2>
+<div class="flex items-center gap-2">
+<div class="relative flex-1">
+<input class="w-full bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded-lg px-3 py-2 text-slate-900 dark:text-white font-mono text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all" type="number" value="0.5"/>
+</div>
+<span class="text-xs text-slate-500">Meters</span>
+</div>
+</div>
+</div>
+<!-- Bottom Actions -->
+<div class="p-6 bg-slate-50 dark:bg-[#0b0e14] border-t border-slate-200 dark:border-slate-800">
+<div class="flex flex-col gap-3">
+<button class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[20px]">save</span>
+                                Save Configuration
+                            </button>
+<button class="w-full flex items-center justify-center gap-2 bg-white dark:bg-[#1c1f27] hover:bg-slate-100 dark:hover:bg-[#282e39] text-slate-700 dark:text-slate-300 font-medium py-3 px-4 rounded-lg border border-slate-200 dark:border-[#3b4354] transition-all">
+<span class="material-symbols-outlined text-[20px]">restart_alt</span>
+                                Recalibrate
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

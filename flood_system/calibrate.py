@@ -22,10 +22,11 @@ logger = logging.getLogger(__name__)
 class Calibrator:
     """Interactive calibration tool for water level detection."""
 
-    def __init__(self, config_path='config.yaml'):
-        self.config_path = config_path
+    def __init__(self, config_filename='config.yaml'):
+        import os
+        self.config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), config_filename)
 
-        with open(config_path, 'r') as f:
+        with open(self.config_path, 'r') as f:
             self.config = yaml.safe_load(f)
 
         self.roi_points = []

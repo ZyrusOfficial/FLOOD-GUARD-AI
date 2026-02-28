@@ -20,11 +20,12 @@ logger = logging.getLogger(__name__)
 class Dashboard:
     """Flask-based web dashboard for flood monitoring."""
 
-    def __init__(self, config, camera, detector, alert_manager):
+    def __init__(self, config, camera, detector, alert_manager, system=None):
         self.config = config
         self.camera = camera
         self.detector = detector
         self.alert_manager = alert_manager
+        self.system = system  # Reference to FloodWarningSystem for model switching
 
         self.app = Flask(__name__,
                          static_folder='static',
@@ -110,8 +111,35 @@ class Dashboard:
                 data = request.get_json()
                 if 'thresholds' in data:
                     self.config['alerts']['thresholds'].update(data['thresholds'])
-                    self._save_config()
+                    # Propagate to live alert manager thresholds
+                    thresh = self.config['alerts']['thresholds']
+                    self.alert_manager.thresholds[1] = thresh.get('warning', 220)
+                    self.alert_manager.thresholds[2] = thresh.get('danger', 260)
+                    self.alert_manager.thresholds[3] = thresh.get('critical', 290)
                     logger.info(f"Thresholds updated: {data['thresholds']}")
+                if 'camera_url' in data:
+                    self.config['camera']['stream_url'] = data['camera_url']
+                    # Parse IP and port from URL
+                    try:
+                        from urllib.parse import urlparse
+                        parsed = urlparse(data['camera_url'])
+                        if parsed.hostname:
+                            self.config['camera']['droidcam_ip'] = parsed.hostname
+                        if parsed.port:
+                            self.config['camera']['droidcam_port'] = parsed.port
+                    except Exception:
+                        pass
+                    logger.info(f"Camera URL updated: {data['camera_url']}")
+                if 'roi' in data:
+                    new_roi = data['roi']
+                    # Ensure it is a list of 4 ints: y1, y2, x1, x2
+                    if isinstance(new_roi, list) and len(new_roi) == 4:
+                        self.config['detection']['roi'] = new_roi
+                        # Propagate immediately to detector
+                        if hasattr(self.detector, 'update_roi'):
+                            self.detector.update_roi(new_roi)
+                        logger.info(f"ROI updated from dashboard: {new_roi}")
+                self._save_config()
                 return jsonify({'status': 'ok'})
 
         @self.app.route('/api/settings', methods=['GET'])
@@ -140,6 +168,56 @@ class Dashboard:
             """Send a test alert through all channels."""
             self.alert_manager._on_level_change(0, 3, 999) # Send critical test
             return jsonify({'status': 'test alert sent'})
+
+        @self.app.route('/api/model', methods=['GET', 'POST'])
+        def api_model():
+            if request.method == 'GET':
+                return jsonify({
+                    'active_model': self.config['detection'].get('active_model', 'canny'),
+                    'available': ['canny', 'yolo']
+                })
+            elif request.method == 'POST':
+                data = request.get_json()
+                model_name = data.get('model', 'canny')
+                if model_name not in ('canny', 'yolo'):
+                    return jsonify({'error': 'Invalid model'}), 400
+                if self.system:
+                    result = self.system.switch_model(model_name)
+                    return jsonify({'active_model': result, 'status': 'ok'})
+                return jsonify({'error': 'System not available'}), 500
+
+        @self.app.route('/api/yolo_config', methods=['GET', 'POST'])
+        def api_yolo_config():
+            yolo_cfg = self.config['detection'].get('yolo', {})
+            if request.method == 'GET':
+                return jsonify(yolo_cfg)
+            elif request.method == 'POST':
+                data = request.get_json()
+                if 'line_start' in data:
+                    yolo_cfg['line_start'] = data['line_start']
+                if 'line_end' in data:
+                    yolo_cfg['line_end'] = data['line_end']
+                if 'pixels_per_meter' in data:
+                    yolo_cfg['pixels_per_meter'] = float(data['pixels_per_meter'])
+                if 'tip_height' in data:
+                    yolo_cfg['tip_height'] = float(data['tip_height'])
+                if 'confidence' in data:
+                    yolo_cfg['confidence'] = float(data['confidence'])
+                self.config['detection']['yolo'] = yolo_cfg
+                self._save_config()
+                # Update live YOLO detector if available
+                if self.system and hasattr(self.system, 'yolo_detector'):
+                    yd = self.system.yolo_detector
+                    yd.update_line(
+                        yolo_cfg.get('line_start', [1094, 231]),
+                        yolo_cfg.get('line_end', [1083, 403])
+                    )
+                    yd.update_scale(
+                        yolo_cfg.get('pixels_per_meter', 15),
+                        yolo_cfg.get('tip_height', 15),
+                        yolo_cfg.get('confidence', 0.5)
+                    )
+                return jsonify({'status': 'ok'})
 
     def _save_config(self):
         """Save current config to YAML file."""

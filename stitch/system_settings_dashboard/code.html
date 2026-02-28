@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>System Settings Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
+<div class="flex h-screen w-full flex-row overflow-hidden">
+<!-- Sidebar -->
+<div class="hidden lg:flex w-72 flex-col justify-between border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111318] p-4">
+<div class="flex flex-col gap-4">
+<div class="flex gap-3 items-center px-2 py-2">
+<div class="bg-center bg-no-repeat bg-cover rounded-full h-10 w-10 bg-primary" data-alt="AquaMonitor Logo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBHAryXO-nhNUO5KxAFjPTK3L0-7PTecJ2sYAJYATR_5je8Zn0i2ikozT6JTRahxi4Mc35L-brDLTCN1MrfeG4MLyhzNjED1Ko1z1diMV_oNDZopAHXtya1Wsc3xfEz5ISYIigQtVDJMpTnSfwDQ1JzA3HWT88eJlnxjOlZBGw9-6yFKDm6Oo1RQvry7y6zERo7gPGKlOYATlXM0MCO5MpilViv8ZdF9WSlY6UrsLqL4YX0WFiVO6fbyVTASfZajD9anFgB4guRYfNq");'></div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-base font-bold leading-normal">AquaMonitor</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">v2.4.1</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 mt-4">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors">dashboard</span>
+<p class="text-slate-600 dark:text-slate-300 text-sm font-medium leading-normal group-hover:text-primary transition-colors">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors">videocam</span>
+<p class="text-slate-600 dark:text-slate-300 text-sm font-medium leading-normal group-hover:text-primary transition-colors">Cameras</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 dark:bg-primary/20 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">memory</span>
+<p class="text-sm font-bold leading-normal">System</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors">description</span>
+<p class="text-slate-600 dark:text-slate-300 text-sm font-medium leading-normal group-hover:text-primary transition-colors">Logs</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors">person</span>
+<p class="text-slate-600 dark:text-slate-300 text-sm font-medium leading-normal group-hover:text-primary transition-colors">Account</p>
+</a>
+</div>
+</div>
+<div class="flex flex-col gap-4 p-2">
+<div class="flex items-center gap-3 px-3 py-2">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">logout</span>
+<p class="text-slate-600 dark:text-slate-300 text-sm font-medium">Sign Out</p>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col h-full overflow-hidden bg-background-light dark:bg-background-dark relative">
+<!-- Header for mobile -->
+<div class="lg:hidden flex items-center justify-between p-4 bg-white dark:bg-[#111318] border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-2">
+<div class="bg-primary h-8 w-8 rounded-full"></div>
+<span class="font-bold text-lg dark:text-white">AquaMonitor</span>
+</div>
+<button class="p-2 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<main class="flex-1 overflow-y-auto p-4 md:p-8 lg:p-12 max-w-7xl mx-auto w-full">
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+<div>
+<h2 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">System Configuration</h2>
+<p class="text-slate-500 dark:text-slate-400 text-base">Monitor hardware performance and configure core connection settings.</p>
+</div>
+<button class="flex items-center justify-center gap-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-white px-5 py-3 rounded-lg font-medium transition-colors">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+                        Check for Updates
+                    </button>
+</header>
+<!-- Stats Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1a202c] border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">Uptime</p>
+<span class="material-symbols-outlined text-primary">timer</span>
+</div>
+<p class="text-slate-900 dark:text-white text-3xl font-bold mt-2">14d 2h 12m</p>
+<div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5 mt-2">
+<div class="bg-primary h-1.5 rounded-full" style="width: 100%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1a202c] border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">CPU Load</p>
+<span class="material-symbols-outlined text-primary">developer_board</span>
+</div>
+<p class="text-slate-900 dark:text-white text-3xl font-bold mt-2">42%</p>
+<div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5 mt-2">
+<div class="bg-yellow-500 h-1.5 rounded-full" style="width: 42%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1a202c] border border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium uppercase tracking-wider">RAM Usage</p>
+<span class="material-symbols-outlined text-primary">memory</span>
+</div>
+<p class="text-slate-900 dark:text-white text-3xl font-bold mt-2">2.1 GB <span class="text-lg text-slate-400 font-normal">/ 4 GB</span></p>
+<div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5 mt-2">
+<div class="bg-primary h-1.5 rounded-full" style="width: 52%"></div>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- DroidCam Config -->
+<section class="bg-white dark:bg-[#1a202c] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+<div class="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">DroidCam Configuration</h3>
+<span class="inline-flex items-center rounded-full bg-green-500/10 px-2 py-1 text-xs font-medium text-green-500 ring-1 ring-inset ring-green-500/20">Active</span>
+</div>
+<div class="p-6 flex flex-col gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<label class="flex flex-col gap-2">
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300">Device IP Address</span>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-[20px]">lan</span>
+</span>
+<input class="w-full rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-slate-400" type="text" value="192.168.1.42"/>
+</div>
+</label>
+<label class="flex flex-col gap-2">
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300">Port</span>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-[20px]">tag</span>
+</span>
+<input class="w-full rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-slate-400" type="text" value="4747"/>
+</div>
+</label>
+</div>
+<div class="rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 p-4">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-400">info</span>
+<div>
+<h4 class="text-sm font-semibold text-blue-900 dark:text-blue-100">Connection Status</h4>
+<p class="text-sm text-blue-700 dark:text-blue-300 mt-1">Camera feed is stable. Last ping response was 12ms ago.</p>
+</div>
+</div>
+</div>
+<div class="flex justify-end pt-2">
+<button class="bg-primary hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-primary/20">
+                                    Save Changes
+                                </button>
+</div>
+</div>
+</section>
+<!-- Fallback Camera -->
+<section class="bg-white dark:bg-[#1a202c] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden h-fit">
+<div class="p-6 border-b border-slate-200 dark:border-slate-800">
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Fallback Camera</h3>
+</div>
+<div class="p-6 flex flex-col gap-4">
+<p class="text-slate-500 dark:text-slate-400 text-sm mb-2">Select a backup video source if the primary DroidCam feed becomes unavailable.</p>
+<div class="space-y-3">
+<label class="flex items-center justify-between p-4 rounded-lg border border-primary bg-primary/5 dark:bg-primary/10 cursor-pointer transition-all">
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center w-5 h-5 rounded-full border-2 border-primary bg-primary">
+<div class="w-2 h-2 rounded-full bg-white"></div>
+</div>
+<div>
+<p class="font-medium text-slate-900 dark:text-white">USB Webcam (Logitech C920)</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">/dev/video0</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary">usb</span>
+</label>
+<label class="flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-[#111318] cursor-pointer transition-all">
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600"></div>
+<div>
+<p class="font-medium text-slate-900 dark:text-white">RTSP Stream</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">rtsp://192.168.1.55/live</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">cast</span>
+</label>
+<label class="flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-[#111318] cursor-pointer transition-all opacity-60">
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600"></div>
+<div>
+<p class="font-medium text-slate-900 dark:text-white">Test Pattern</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Internal Generator</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-400">grid_on</span>
+</label>
+</div>
+</div>
+</section>
+</div>
+<!-- Advanced Settings Toggle -->
+<section class="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Advanced Telemetry</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Send anonymous usage statistics to help improve detection algorithms.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 dark:peer-focus:ring-primary/20 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+</section>
+</main>
+</div>
+</div>
+</body></html>

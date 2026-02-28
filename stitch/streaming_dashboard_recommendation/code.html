@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StreamFlow - OLED Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#d41142",
+                        "background-light": "#000000",
+                        "background-dark": "#000000",
+                        "surface-dark": "#121212",
+                        "surface-glass": "rgba(18, 18, 18, 0.6)",
+                        "text-secondary": "#a0a0a0",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                    boxShadow: {
+                        'ambient-orange': '0 40px 100px -10px rgba(255, 100, 30, 0.5)',
+                        'ambient-blue': '0 40px 100px -10px rgba(40, 90, 255, 0.5)',
+                        'ambient-purple': '0 40px 100px -10px rgba(160, 40, 255, 0.5)',
+                        'ambient-teal': '0 40px 100px -10px rgba(40, 255, 180, 0.5)',
+                        'ambient-red': '0 40px 100px -10px rgba(255, 40, 40, 0.5)',
+                        'ambient-amber': '0 40px 100px -10px rgba(255, 170, 40, 0.5)',
+                        'ambient-indigo': '0 40px 100px -10px rgba(90, 40, 255, 0.5)',
+                        'ambient-cyan': '0 40px 100px -10px rgba(40, 210, 255, 0.5)',
+                        'ambient-rose': '0 40px 100px -10px rgba(255, 40, 140, 0.5)',
+                        'ambient-green': '0 40px 100px -10px rgba(40, 255, 90, 0.4)',
+                        'ambient-orange-hover': '0 50px 120px -5px rgba(255, 120, 50, 0.8)',
+                        'ambient-blue-hover': '0 50px 120px -5px rgba(50, 100, 255, 0.8)',
+                        'ambient-purple-hover': '0 50px 120px -5px rgba(150, 50, 255, 0.8)',
+                        'ambient-teal-hover': '0 50px 120px -5px rgba(50, 255, 200, 0.8)',
+                        'ambient-red-hover': '0 50px 120px -5px rgba(255, 50, 50, 0.8)',
+                        'ambient-amber-hover': '0 50px 120px -5px rgba(255, 180, 50, 0.8)',
+                        'ambient-indigo-hover': '0 50px 120px -5px rgba(80, 50, 255, 0.8)',
+                        'ambient-cyan-hover': '0 50px 120px -5px rgba(50, 200, 255, 0.8)',
+                        'ambient-rose-hover': '0 50px 120px -5px rgba(255, 50, 150, 0.8)',
+                        'ambient-green-hover': '0 50px 120px -5px rgba(50, 255, 100, 0.7)',
+                        'nav-icon-glow': '0 0 15px rgba(255, 255, 255, 0.6)',
+                        'glass-card': '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
+                    },
+                    animation: {
+                        'ken-burns': 'ken-burns 20s ease-out infinite alternate',
+                    },
+                    keyframes: {
+                        'ken-burns': {
+                            '0%': { transform: 'scale(1)' },
+                            '100%': { transform: 'scale(1.1)' },
+                        }
+                    }
+                },
+            },
+        }
+    </script>
+<style>.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }.hero-gradient {
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 60%, #000000 100%);
+        }
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-black text-slate-200 font-display overflow-x-hidden selection:bg-primary selection:text-white">
+<div class="relative flex min-h-screen w-full flex-col">
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between border-b border-white/5 bg-black/60 backdrop-blur-xl px-12 py-3 transition-all duration-500">
+<div class="flex items-center gap-16">
+<div class="flex items-center gap-3 text-white group cursor-pointer">
+<div class="size-6 text-primary group-hover:drop-shadow-[0_0_10px_rgba(212,17,66,0.8)] transition-all duration-300">
+<svg class="w-full h-full" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M39.5563 34.1455V13.8546C39.5563 15.708 36.8773 17.3437 32.7927 18.3189C30.2914 18.916 27.263 19.2655 24 19.2655C20.737 19.2655 17.7086 18.916 15.2073 18.3189C11.1227 17.3437 8.44365 15.708 8.44365 13.8546V34.1455C8.44365 35.9988 11.1227 37.6346 15.2073 38.6098C17.7086 39.2069 20.737 39.5564 24 39.5564C27.263 39.5564 30.2914 39.2069 32.7927 38.6098C36.8773 37.6346 39.5563 35.9988 39.5563 34.1455Z" fill="currentColor"></path>
+<path clip-rule="evenodd" d="M10.4485 13.8519C10.4749 13.9271 10.6203 14.246 11.379 14.7361C12.298 15.3298 13.7492 15.9145 15.6717 16.3735C18.0007 16.9296 20.8712 17.2655 24 17.2655C27.1288 17.2655 29.9993 16.9296 32.3283 16.3735C34.2508 15.9145 35.702 15.3298 36.621 14.7361C37.3796 14.246 37.5251 13.9271 37.5515 13.8519C37.5287 13.7876 37.4333 13.5973 37.0635 13.2931C36.5266 12.8516 35.6288 12.3647 34.343 11.9175C31.79 11.0295 28.1333 10.4437 24 10.4437C19.8667 10.4437 16.2099 11.0295 13.657 11.9175C12.3712 12.3647 11.4734 12.8516 10.9365 13.2931C10.5667 13.5973 10.4713 13.7876 10.4485 13.8519ZM37.5563 18.7877C36.3176 19.3925 34.8502 19.8839 33.2571 20.2642C30.5836 20.9025 27.3973 21.2655 24 21.2655C20.6027 21.2655 17.4164 20.9025 14.7429 20.2642C13.1498 19.8839 11.6824 19.3925 10.4436 18.7877V34.1275C10.4515 34.1545 10.5427 34.4867 11.379 35.027C12.298 35.6207 13.7492 36.2054 15.6717 36.6644C18.0007 37.2205 20.8712 37.5564 24 37.5564C27.1288 37.5564 29.9993 37.2205 32.3283 36.6644C34.2508 36.2054 35.702 35.6207 36.621 35.027C37.4573 34.4867 37.5485 34.1546 37.5563 34.1275V18.7877ZM41.5563 13.8546V34.1455C41.5563 36.1078 40.158 37.5042 38.7915 38.3869C37.3498 39.3182 35.4192 40.0389 33.2571 40.5551C30.5836 41.1934 27.3973 41.5564 24 41.5564C20.6027 41.5564 17.4164 41.1934 14.7429 40.5551C12.5808 40.0389 10.6502 39.3182 9.20848 38.3869C7.84205 37.5042 6.44365 36.1078 6.44365 34.1455L6.44365 13.8546C6.44365 12.2684 7.37223 11.0454 8.39581 10.2036C9.43325 9.3505 10.8137 8.67141 12.343 8.13948C15.4203 7.06909 19.5418 6.44366 24 6.44366C28.4582 6.44366 32.5797 7.06909 35.657 8.13948C37.1863 8.67141 38.5667 9.3505 39.6042 10.2036C40.6278 11.0454 41.5563 12.2684 41.5563 13.8546Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-white text-lg font-medium tracking-wide">StreamFlow</h2>
+</div>
+<nav class="hidden md:flex items-center gap-10">
+<a class="text-white hover:text-white transition-all text-xs font-light tracking-widest uppercase flex flex-col items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-[20px] mb-1 group-hover:shadow-nav-icon-glow rounded-full transition-shadow duration-300">home</span>
+<span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Home</span>
+</a>
+<a class="text-text-secondary hover:text-white transition-all text-xs font-light tracking-widest uppercase flex flex-col items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-[20px] mb-1 group-hover:shadow-nav-icon-glow rounded-full transition-shadow duration-300">movie</span>
+<span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Movies</span>
+</a>
+<a class="text-text-secondary hover:text-white transition-all text-xs font-light tracking-widest uppercase flex flex-col items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-[20px] mb-1 group-hover:shadow-nav-icon-glow rounded-full transition-shadow duration-300">live_tv</span>
+<span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Series</span>
+</a>
+<a class="text-text-secondary hover:text-white transition-all text-xs font-light tracking-widest uppercase flex flex-col items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-[20px] mb-1 group-hover:shadow-nav-icon-glow rounded-full transition-shadow duration-300">bookmark</span>
+<span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">List</span>
+</a>
+</nav>
+</div>
+<div class="flex items-center gap-8">
+<div class="hidden lg:flex relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-secondary group-focus-within:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">search</span>
+</div>
+<input class="bg-white/5 border border-white/5 rounded-full py-1.5 pl-9 pr-4 text-xs font-light tracking-wide text-white placeholder-text-secondary/50 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/50 focus:bg-white/10 w-48 focus:w-64 transition-all duration-300" placeholder="Search..." type="text"/>
+</div>
+<button class="text-text-secondary hover:text-white transition-colors relative">
+<span class="material-symbols-outlined text-[22px]">notifications</span>
+<span class="absolute top-0 right-0 size-2 bg-primary rounded-full shadow-[0_0_8px_rgba(212,17,66,0.8)]"></span>
+</button>
+<div class="h-8 w-8 rounded-full bg-cover bg-center cursor-pointer border border-white/10 hover:border-white transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]" data-alt="User profile picture showing a smiling person" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBl11RQunk9cK9Vev4hT4ZNqLzJ5s6R7UD3Nxs4JME0BKXw12pni76nVIbvkG0xCuzsZI52Gus7mCNL8rEPbQkCAHTcdwoiadtlrGe4wjvMAEEjm6VOEelQPwHisXZIsrnOE3D6xajC9pK6GLNsnrkAm0JHe5D47wb0RVz6VkGXmBK43w6rDDQ6dBcfOXq0sPKsmam3SgcXiR2P72unUj0vXq85zUAVFfuJEaSEv9mwQ-WeTEsBVOT6uuUrkKu2gKYT4kGD0NSI2VA");'></div>
+</div>
+</header>
+<main class="relative z-10 flex-1 flex flex-col w-full pb-32">
+<div class="relative w-full h-[90vh] min-h-[700px] flex items-end overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center bg-no-repeat animate-ken-burns" data-alt="Dark moody cinematic movie scene with fog and dramatic lighting" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBm6FcaJNwjo8edNQHUuOh9_IF9nqKLI66JvYo8TPEBzIcit_hcWbDvQ871WoqbygkFBcoXi6-qRRuA3PvHOb07sRcp6NHJwW2LpJb9NvKg7IJXSEWVKwOtTC71xtVNhqDfLuGkFbtEQV6DiIMnbDQHf0U3pZU8yIhkZM3lLxrTlNe5NhJuMBcGlr-UKPA6st7ImMUn7J3AFFipcIp5K2cceuNWJEMjHzCbHqhOfWJp8ekkvUecKpQckAceiJwDZ9Asy3mNGK05CMg"); transform-origin: center center;'>
+</div>
+<div class="absolute inset-0 hero-gradient"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-black via-black/30 to-transparent"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+<div class="relative w-full max-w-[1600px] mx-auto px-8 md:px-16 pb-32 flex flex-col gap-8 items-start z-10">
+<div class="flex items-center gap-4 opacity-0 animate-[fadeIn_1s_ease-out_0.5s_forwards]">
+<span class="px-3 py-1 rounded-sm bg-primary/20 border border-primary/30 text-primary text-[10px] font-bold uppercase tracking-[0.2em] backdrop-blur-md">New Season</span>
+<span class="h-4 w-[1px] bg-white/20"></span>
+<span class="text-gray-300 text-xs font-light tracking-wide uppercase">Sci-Fi • Adventure • 2024</span>
+</div>
+<h1 class="text-6xl md:text-8xl font-black text-white leading-[0.9] tracking-tighter max-w-4xl drop-shadow-2xl opacity-0 animate-[slideUp_1s_ease-out_0.2s_forwards]">
+                        Eclipsed Horizons
+                    </h1>
+<p class="text-gray-300 text-lg md:text-xl max-w-2xl leading-relaxed font-extralight drop-shadow-lg opacity-0 animate-[slideUp_1s_ease-out_0.4s_forwards]">
+                        In a future where sunlight is a currency, a rogue pilot discovers a planet that never sets. The fight for the last dawn begins now.
+                    </p>
+<div class="flex flex-wrap gap-6 mt-4 opacity-0 animate-[slideUp_1s_ease-out_0.6s_forwards]">
+<button class="flex items-center justify-center gap-3 bg-white text-black hover:bg-gray-200 px-10 py-4 rounded-full font-bold text-sm tracking-wide transition-all transform hover:scale-105 shadow-[0_0_40px_-10px_rgba(255,255,255,0.5)]">
+<span class="material-symbols-outlined fill-current text-[24px]">play_arrow</span>
+                            PLAY NOW
+                        </button>
+<button class="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white px-10 py-4 rounded-full font-medium text-sm tracking-wide transition-all border border-white/10 hover:border-white/30">
+<span class="material-symbols-outlined text-[24px]">info</span>
+                            MORE INFO
+                        </button>
+</div>
+</div>
+</div>
+<div class="w-full max-w-[1800px] mx-auto flex flex-col gap-20 -mt-20 relative z-20 px-8 md:px-16">
+<div class="flex flex-col gap-8">
+<div class="flex items-end justify-between border-b border-white/5 pb-4">
+<h3 class="text-white text-3xl md:text-4xl font-extralight tracking-tight font-display">Recommended <span class="font-bold text-white/40">for You</span></h3>
+<div class="flex gap-2">
+<button class="size-10 rounded-full border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors">
+<span class="material-symbols-outlined text-lg">chevron_left</span>
+</button>
+<button class="size-10 rounded-full border border-white/10 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors">
+<span class="material-symbols-outlined text-lg">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="flex gap-10 overflow-x-auto no-scrollbar pb-16 pt-6 -mx-8 px-8 md:mx-0 md:px-0 scroll-smooth">
+<div class="group relative flex-none w-[240px] md:w-[280px] perspective-1000">
+<div class="relative aspect-[2/3] rounded-2xl overflow-hidden transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-4 shadow-ambient-orange group-hover:shadow-ambient-orange-hover z-10 cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Movie poster for Dune featuring desert landscape" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAUuG7-aCeQ6yjjVpc1yfkKOL_NfmlHCZwMcpGTsf9aAwquTWeeUQ6nlbdCpZlf9QWCB5OSYsEcNrDShrdNvv206GlYa9uGvr3FWpOMkEXi3c9NEfLFVMMVwXDYguv8uZXLO72BWk_B3cCs6DalYcpcTAE_vFO6Fm9TDHBCRSvrTaEotj2TRXNMdM0-7HCTd2TD2w1wu9UBeI8KGgJGxKANEYFuMZhIJWiXH6NVIM0axTEQRubImAiYVfOEU_gS9MBy0_YBESs2lIQ");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+<div class="absolute inset-x-0 bottom-0 top-0 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0">
+<div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-white uppercase tracking-wider">IMAX</span>
+<span class="text-green-400 text-xs font-bold">98% Match</span>
+</div>
+<p class="text-xs text-gray-200 line-clamp-4 leading-relaxed font-light mb-4">Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family.</p>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-white/50 uppercase tracking-widest">Duration</span>
+<span class="text-xs font-medium text-white">2h 46m</span>
+</div>
+<button class="bg-white text-black p-3 rounded-full hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+<span class="material-symbols-outlined text-xl">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 opacity-80 group-hover:opacity-100 transition-opacity">
+<h4 class="text-white font-medium text-xl tracking-tight">Dune: Part Two</h4>
+<div class="flex items-center gap-3 text-xs text-text-secondary mt-2 font-light">
+<span>Sci-Fi</span>
+<span class="size-1 bg-white/30 rounded-full"></span>
+<span>Adventure</span>
+</div>
+</div>
+</div>
+<div class="group relative flex-none w-[240px] md:w-[280px] perspective-1000">
+<div class="relative aspect-[2/3] rounded-2xl overflow-hidden transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-4 shadow-ambient-indigo group-hover:shadow-ambient-indigo-hover z-10 cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Abstract space scene representing Interstellar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDOUX2t_jLRrY8JBAFgokoK6YfYBMp8MnwuhbqGKEgRDpmO_jRft9AKOIuyuJwmhYxjD3Tt1QVwQwnM8rG-8s4mR3BftA3QaVFhO0n0PzTCtebgIbjujRi7H9sPRj1ZSiKdQduSjsce0-_iycQaNV5cQRl6ECD4sPJ0j2mJrY--gsP6hVeywHzTC0oDgtf3_eyCVcnEQeK3FoIF6WPQmBMQYNb7HkzDuOdd2ejC2wPIM99KHPNPxHyc5EEKApM9QaZ_kHuhDzlNOBk");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+<div class="absolute inset-x-0 bottom-0 top-0 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0">
+<div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-primary/20 border border-primary/40 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-primary uppercase tracking-wider">4K HDR</span>
+</div>
+<p class="text-xs text-gray-200 line-clamp-4 leading-relaxed font-light mb-4">A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.</p>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-white/50 uppercase tracking-widest">Year</span>
+<span class="text-xs font-medium text-white">2014</span>
+</div>
+<button class="bg-white text-black p-3 rounded-full hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+<span class="material-symbols-outlined text-xl">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 opacity-80 group-hover:opacity-100 transition-opacity">
+<h4 class="text-white font-medium text-xl tracking-tight">Interstellar</h4>
+<div class="flex items-center gap-3 text-xs text-text-secondary mt-2 font-light">
+<span>Sci-Fi</span>
+<span class="size-1 bg-white/30 rounded-full"></span>
+<span>Drama</span>
+</div>
+</div>
+</div>
+<div class="group relative flex-none w-[240px] md:w-[280px] perspective-1000">
+<div class="relative aspect-[2/3] rounded-2xl overflow-hidden transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-4 shadow-ambient-blue group-hover:shadow-ambient-blue-hover z-10 cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Dark moody cityscape for Batman The Dark Knight" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAgELJJVY72EOtc1p4vHHfJKrAKCK706xQVoAmu1kv6q4nnjaXIfMJo2xTnR-KMybYw13wdHIRXAxpJjvVk8RR2Mu67h97iy1R43ntLHFRhcaFdNFRF-FQ8pxEMmZC5R87Z05fZH1Cd7BiH5bZTp_TmdZh8nA1507Sn5VslcM2SYtOwMSGbloPFK1oL5U6tMN4ILrz8ZK2fRaR1ZeG0jb6PQTfSCXP5NsoyHfatPcaVld6R2yerI8vbtErwCNpm7uUATasufgLK2A0");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+<div class="absolute inset-x-0 bottom-0 top-0 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0">
+<div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-white uppercase tracking-wider">HD</span>
+</div>
+<p class="text-xs text-gray-200 line-clamp-4 leading-relaxed font-light mb-4">When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological tests.</p>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-white/50 uppercase tracking-widest">Duration</span>
+<span class="text-xs font-medium text-white">2h 32m</span>
+</div>
+<button class="bg-white text-black p-3 rounded-full hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+<span class="material-symbols-outlined text-xl">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 opacity-80 group-hover:opacity-100 transition-opacity">
+<h4 class="text-white font-medium text-xl tracking-tight">The Dark Knight</h4>
+<div class="flex items-center gap-3 text-xs text-text-secondary mt-2 font-light">
+<span>Action</span>
+<span class="size-1 bg-white/30 rounded-full"></span>
+<span>Crime</span>
+</div>
+</div>
+</div>
+<div class="group relative flex-none w-[240px] md:w-[280px] perspective-1000">
+<div class="relative aspect-[2/3] rounded-2xl overflow-hidden transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-4 shadow-ambient-cyan group-hover:shadow-ambient-cyan-hover z-10 cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Futuristic neon city representing Blade Runner 2049" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBDKj5Wi_Xs-BB35lolO9E18aya_Fn7DUvH5P2SqkMpOPh81dYOeMFyGs2cIEScsCPzaHj1B1gwbA8esB7KS57Eqk19drbnAn4BKwkd7IKfuAAw3NIHjJnPjYjqTHHH-ZqVw4Y1tTaA_Tb1F33sIoYaDhFxmEqlQkMU3Qr1rVk2PwnpFN831QDVJ-e6U_uql2X3H0SUmQXONNsTYm3lD6q3G6QyTuT3fR49uYSI2NBuCIt1AA1wmh2OkOy-56rRa7QjJvBRRDBLGu0");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+<div class="absolute inset-x-0 bottom-0 top-0 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0">
+<div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-primary/20 border border-primary/40 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-primary uppercase tracking-wider">Dolby</span>
+</div>
+<p class="text-xs text-gray-200 line-clamp-4 leading-relaxed font-light mb-4">Young Blade Runner K's discovery of a long-buried secret leads him to track down former Blade Runner Rick Deckard.</p>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-white/50 uppercase tracking-widest">Director</span>
+<span class="text-xs font-medium text-white">Villeneuve</span>
+</div>
+<button class="bg-white text-black p-3 rounded-full hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+<span class="material-symbols-outlined text-xl">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 opacity-80 group-hover:opacity-100 transition-opacity">
+<h4 class="text-white font-medium text-xl tracking-tight">Blade Runner 2049</h4>
+<div class="flex items-center gap-3 text-xs text-text-secondary mt-2 font-light">
+<span>Sci-Fi</span>
+<span class="size-1 bg-white/30 rounded-full"></span>
+<span>Mystery</span>
+</div>
+</div>
+</div>
+<div class="group relative flex-none w-[240px] md:w-[280px] perspective-1000">
+<div class="relative aspect-[2/3] rounded-2xl overflow-hidden transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-4 shadow-ambient-rose group-hover:shadow-ambient-rose-hover z-10 cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Abstract colorful poster representing Spider-Man Into the Spider-Verse" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuANXWZSlgifx5H0K881L7K9g6bptaOktZA78RpFFM4JTtVZQABMzKMUGQ2K-k_Z4AqXYefLbhy0T5fvtk5NPJGvIeW-RhiAkLlwEZ4yiIrdSpcEadBuOk9JB2lBuONc42Kl2dxQRMj_WgMnboTn2jzf2cdWd2XcBr-GRSA9jdcXM_5c7hR2vblUOIStx60YL-En5bYNXPQJdBKt6Q_WsatkM6XEjuvcFt3cgTn_vXCkYciPxPDM_xkhsIOxmhKRKYkkzdvjIUO0YKA");'></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+<div class="absolute inset-x-0 bottom-0 top-0 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0">
+<div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold text-white uppercase tracking-wider">Animation</span>
+</div>
+<p class="text-xs text-gray-200 line-clamp-4 leading-relaxed font-light mb-4">Teen Miles Morales becomes the Spider-Man of his universe, and must join with five spider-powered individuals from other dimensions.</p>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-white/50 uppercase tracking-widest">Rating</span>
+<span class="text-xs font-medium text-white">8.4</span>
+</div>
+<button class="bg-white text-black p-3 rounded-full hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+<span class="material-symbols-outlined text-xl">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 opacity-80 group-hover:opacity-100 transition-opacity">
+<h4 class="text-white font-medium text-xl tracking-tight">Spider-Man</h4>
+<div class="flex items-center gap-3 text-xs text-text-secondary mt-2 font-light">
+<span>Animation</span>
+<span class="size-1 bg-white/30 rounded-full"></span>
+<span>Action</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-8">
+<div class="flex items-end justify-between border-b border-white/5 pb-4">
+<h3 class="text-white text-3xl md:text-4xl font-extralight tracking-tight font-display">Continue <span class="font-bold text-white/40">Watching</span></h3>
+</div>
+<div class="flex gap-12 overflow-x-auto no-scrollbar pb-16 pt-6 -mx-8 px-8 md:mx-0 md:px-0 scroll-smooth">
+<div class="group relative flex-none w-[320px] md:w-[400px] cursor-pointer">
+<div class="relative aspect-video rounded-2xl overflow-hidden transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-2 border border-white/5 shadow-ambient-teal group-hover:shadow-ambient-teal-hover">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Screenshot of an art gallery scene" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBWLeI8SpPU0AuAOKsTnK9to7hCvYlazbSLwlV4J9KfcyuHX3dvrXqyw2UiyyNwo98FLLcFxj1NIVLdi9tYI1ZGudjG21HQQDTQ-dqhbIpiOnmuTsu_UnniAbf7rInRCSW7SMYRGpm0Bp-PiJYyRMEBxKXQtoybC4JM1CvZfGdQojOgy2ExIJIXtaj7smBwg8nEVbmGbY-s5qj-jZ72yi2RR06LyCq0ntbku5EX5HIW3KFsdLzg3W3JCFfWlcFkIn0HKejKrUmIwO0");'></div>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors"></div>
+<div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+<button class="bg-white text-black size-14 rounded-full flex items-center justify-center transform scale-75 group-hover:scale-100 transition-transform duration-300 shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+<span class="material-symbols-outlined text-3xl ml-1">play_arrow</span>
+</button>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
+<div class="h-full bg-primary w-[70%] shadow-[0_0_15px_rgba(212,17,66,0.8)]"></div>
+</div>
+</div>
+<div class="mt-6 flex justify-between items-start">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="text-[10px] font-bold text-primary uppercase tracking-widest">S1:E4</span>
+<span class="text-[10px] text-text-secondary uppercase tracking-widest">24m Remaining</span>
+</div>
+<h4 class="text-white font-medium text-xl truncate">The Queen's Gambit</h4>
+<p class="text-text-secondary font-light text-sm mt-1">Middle Game</p>
+</div>
+</div>
+</div>
+<div class="group relative flex-none w-[320px] md:w-[400px] cursor-pointer">
+<div class="relative aspect-video rounded-2xl overflow-hidden transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-2 border border-white/5 shadow-ambient-red group-hover:shadow-ambient-red-hover">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Screenshot of a stranger things scene with bikes" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBPWedu7bfpsxPii8BB39lfCqCJQ0SgNO1RKmnU3e6XbXIJmuXzzOruXMgSETj2fGHOEN_htbdFgCKKD3syJxAoSEM0xUmXbCAEAujIQxnQ3LRF60BNxSF7M5LKOhdri03MtXZXOoqOlDTCRmp445zxAaMzIy7UaK60XPQDA-2fRvbEf0zec2NErE_XFq4rjWJrB1zSE_asRvC3pA7vHPBaW5BFF5h2MGlC_J1kPAzzVlKsDNsBtIDKV6QHTcInJB79iMapw2lc4zQ");'></div>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors"></div>
+<div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+<button class="bg-white text-black size-14 rounded-full flex items-center justify-center transform scale-75 group-hover:scale-100 transition-transform duration-300 shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+<span class="material-symbols-outlined text-3xl ml-1">play_arrow</span>
+</button>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
+<div class="h-full bg-primary w-[30%] shadow-[0_0_15px_rgba(212,17,66,0.8)]"></div>
+</div>
+</div>
+<div class="mt-6 flex justify-between items-start">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="text-[10px] font-bold text-primary uppercase tracking-widest">S4:E1</span>
+<span class="text-[10px] text-text-secondary uppercase tracking-widest">48m Remaining</span>
+</div>
+<h4 class="text-white font-medium text-xl truncate">Stranger Things</h4>
+<p class="text-text-secondary font-light text-sm mt-1">The Hellfire Club</p>
+</div>
+</div>
+</div>
+<div class="group relative flex-none w-[320px] md:w-[400px] cursor-pointer">
+<div class="relative aspect-video rounded-2xl overflow-hidden transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-2 border border-white/5 shadow-ambient-purple group-hover:shadow-ambient-purple-hover">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Screenshot of a cyberpunk movie scene" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBHVtfTLd2T2ZUdCuP5aj4EnJ8pRiLxeVKKsNWJBDAtY4QPyxuaksqpz_73Q-S1ifq6duzAkBShoipTnLNewTmVBRSuSYfPdVt3jZqTXSXdc3xATy_8QeGoh09emJt6KxblSyzJXXbW_5kCYoFaLjhrQKnf0Y6zQnPTmiIdBWtV-C09gpRQw2lodbsrSP-C27J_1xzSTcWAuTsPHc_wILZu4xJmMgHc5Xo6376gFcA-fL6lmgLmHLctKQxuaXfVzNkKtslBv2SnCHI");'></div>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors"></div>
+<div class="absolute inset-0 bg-black/60 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+<button class="bg-white text-black size-14 rounded-full flex items-center justify-center transform scale-75 group-hover:scale-100 transition-transform duration-300 shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+<span class="material-symbols-outlined text-3xl ml-1">play_arrow</span>
+</button>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
+<div class="h-full bg-primary w-[90%] shadow-[0_0_15px_rgba(212,17,66,0.8)]"></div>
+</div>
+</div>
+<div class="mt-6 flex justify-between items-start">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="text-[10px] font-bold text-primary uppercase tracking-widest">S1:E8</span>
+<span class="text-[10px] text-text-secondary uppercase tracking-widest">5m Remaining</span>
+</div>
+<h4 class="text-white font-medium text-xl truncate">Altered Carbon</h4>
+<p class="text-text-secondary font-light text-sm mt-1">Clash by Night</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-8">
+<div class="flex items-end justify-between border-b border-white/5 pb-4">
+<h3 class="text-white text-3xl md:text-4xl font-extralight tracking-tight font-display">Trending <span class="font-bold text-white/40">Now</span></h3>
+</div>
+<div class="flex gap-10 overflow-x-auto no-scrollbar pb-16 pt-6 -mx-8 px-8 md:mx-0 md:px-0 scroll-smooth">
+<div class="group relative flex-none w-[240px] md:w-[280px]">
+<div class="relative aspect-[2/3] rounded-2xl overflow-hidden transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-4 shadow-ambient-amber group-hover:shadow-ambient-amber-hover z-10 cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Movie poster for Oppenheimer showing nuclear explosion art" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBQ73f9-mUFP7k7wcG0NHXxWnC8OCye1vu1IqhGqja0IWjnPgS_yeUgk5UsJVCJNcHcEyLswrVGbZGAi1AcWFSl9ATPTQALtjO1F6CLikEX_nEbBLOokNrPY23BxM9UcE1_EQDcYP3OfgDaKGVtyw2XvIm-CtvQYSunqERKxxwCP9ZF4luJ8LQ36t2krgKelpsVJmSPR9BjnaLz1WSGKsTSzEGi1P6CU7mCYjHx4RERclc7JHe0XNkEBOwdehAOpiXjqZNzKIvKzLE");'></div>
+<div class="absolute top-0 right-0 bg-white text-black px-4 py-2 rounded-bl-2xl text-lg font-black shadow-lg z-20">#1</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+<div class="absolute inset-x-0 bottom-0 top-0 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0">
+<div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
+<p class="text-xs text-gray-200 line-clamp-4 leading-relaxed font-light mb-4">The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb.</p>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-white/50 uppercase tracking-widest">Cast</span>
+<span class="text-xs font-medium text-white">Murphy, Blunt</span>
+</div>
+<button class="bg-white text-black p-3 rounded-full hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+<span class="material-symbols-outlined text-xl">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 opacity-80 group-hover:opacity-100 transition-opacity">
+<h4 class="text-white font-medium text-xl tracking-tight">Oppenheimer</h4>
+<div class="flex items-center gap-3 text-xs text-text-secondary mt-2 font-light">
+<span>Biography</span>
+<span class="size-1 bg-white/30 rounded-full"></span>
+<span>Drama</span>
+</div>
+</div>
+</div>
+<div class="group relative flex-none w-[240px] md:w-[280px]">
+<div class="relative aspect-[2/3] rounded-2xl overflow-hidden transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-4 shadow-ambient-green group-hover:shadow-ambient-green-hover z-10 cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Movie poster for a fantasy nature documentary" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCXrYFMrj60xW5okRimSG2MiMkq3c7xCzblM-O9En-_fX4GAWGrXpiPe4Oz4QOAOvdLmAg3M3uCFke5rLXF07RrnhkKtb3w5xdwkeQTOJTYt2FIhlkIIfLLwIm00w8iv3CGXWm3n_esC7otVJjnCaLC77z6e5WFN3e_hTySZ-nwjWrzKYqNOjrFh9Ke2MqI_PV1DtJwgSF_nfBNV9kPjHiBPkgoUc7-3JPjGO6qyVc-a_85ll-wFqaDf9OJSOSwd3CKP6DrHZ3WblE");'></div>
+<div class="absolute top-0 right-0 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-bl-2xl text-lg font-black border-l border-b border-white/10 z-20">#2</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+<div class="absolute inset-x-0 bottom-0 top-0 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0">
+<div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
+<p class="text-xs text-gray-200 line-clamp-4 leading-relaxed font-light mb-4">David Attenborough presents a documentary series exploring the planet's most spectacular habitats.</p>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-white/50 uppercase tracking-widest">Episodes</span>
+<span class="text-xs font-medium text-white">8 Parts</span>
+</div>
+<button class="bg-white text-black p-3 rounded-full hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+<span class="material-symbols-outlined text-xl">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 opacity-80 group-hover:opacity-100 transition-opacity">
+<h4 class="text-white font-medium text-xl tracking-tight">Planet Earth III</h4>
+<div class="flex items-center gap-3 text-xs text-text-secondary mt-2 font-light">
+<span>Documentary</span>
+<span class="size-1 bg-white/30 rounded-full"></span>
+<span>Nature</span>
+</div>
+</div>
+</div>
+<div class="group relative flex-none w-[240px] md:w-[280px]">
+<div class="relative aspect-[2/3] rounded-2xl overflow-hidden transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-4 shadow-ambient-blue group-hover:shadow-ambient-blue-hover z-10 cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Movie poster for The Bear TV show featuring kitchen scene" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD_iOgM6wWHFuYpTU4oNPb6s9UWx0U6cBB-6XO5E8_ozreiwIDiROL_FapNxO5w1Pr_woQie64Kk-Yl0Ci-n3Vq20sxOs0zfLWvFrsoNZp5w1osk4KRDaHvd12gOyR_dORCEPOm5LST-Ghsl32MXeLd2tutnt0bq_t2w3ct2JJAM_FHbCkc7NyhewGQYybJ41jtLATmCn7uFrU-PwI3wfFfX3sDSfJcdavc-sXjCUNh0fBotS2_KPDTQZxLx3tlrDVH0XeEu9p0aTA");'></div>
+<div class="absolute top-0 right-0 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-bl-2xl text-lg font-black border-l border-b border-white/10 z-20">#3</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+<div class="absolute inset-x-0 bottom-0 top-0 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0">
+<div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
+<p class="text-xs text-gray-200 line-clamp-4 leading-relaxed font-light mb-4">A young chef from the fine dining world returns to Chicago to run his family's sandwich shop.</p>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-white/50 uppercase tracking-widest">Season</span>
+<span class="text-xs font-medium text-white">Season 3</span>
+</div>
+<button class="bg-white text-black p-3 rounded-full hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+<span class="material-symbols-outlined text-xl">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 opacity-80 group-hover:opacity-100 transition-opacity">
+<h4 class="text-white font-medium text-xl tracking-tight">The Bear</h4>
+<div class="flex items-center gap-3 text-xs text-text-secondary mt-2 font-light">
+<span>Comedy</span>
+<span class="size-1 bg-white/30 rounded-full"></span>
+<span>Drama</span>
+</div>
+</div>
+</div>
+<div class="group relative flex-none w-[240px] md:w-[280px]">
+<div class="relative aspect-[2/3] rounded-2xl overflow-hidden transition-all duration-500 ease-out group-hover:scale-105 group-hover:-translate-y-4 shadow-ambient-red group-hover:shadow-ambient-red-hover z-10 cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Movie poster for a dystopian thriller" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCyfoSIeu5r68Gkw0HNWMZKTA5x0EBStsMMXEVyJZuO9x4wDEXGQ-PbY9IwlZg5JQy3VA1BilAzJ5piHYHANuyVkFHxfwP6RNzoUHg7XblEE_AZOgvn8GB8KxHxIeMG3H6dcfdnMOaZkY4Ly8BKuzrNevyN4EP1CT1ci7YNmMfk9qm9smMPYDBCWWPUq7kNHRodjoLtn_EPxXBGiSda7WvkJwJt_CtrrT6KEmR-MbvyO95Z_mPSM4FaspFowd3vi4qzLlU2_q6GbSA");'></div>
+<div class="absolute top-0 right-0 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-bl-2xl text-lg font-black border-l border-b border-white/10 z-20">#4</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+<div class="absolute inset-x-0 bottom-0 top-0 bg-black/40 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-6 translate-y-4 group-hover:translate-y-0">
+<div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75">
+<p class="text-xs text-gray-200 line-clamp-4 leading-relaxed font-light mb-4">A journey across a dystopian future America, following a team of military-embedded journalists.</p>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-[10px] text-white/50 uppercase tracking-widest">Genre</span>
+<span class="text-xs font-medium text-white">Action</span>
+</div>
+<button class="bg-white text-black p-3 rounded-full hover:scale-110 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.4)]">
+<span class="material-symbols-outlined text-xl">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 opacity-80 group-hover:opacity-100 transition-opacity">
+<h4 class="text-white font-medium text-xl tracking-tight">Civil War</h4>
+<div class="flex items-center gap-3 text-xs text-text-secondary mt-2 font-light">
+<span>Action</span>
+<span class="size-1 bg-white/30 rounded-full"></span>
+<span>Thriller</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-20 py-16 border-t border-white/5 bg-black text-center z-10">
+<div class="flex items-center justify-center gap-10 mb-8">
+<a class="text-text-secondary hover:text-white transition-colors p-3 hover:bg-white/5 rounded-full" href="#"><span class="material-symbols-outlined text-2xl">social_leaderboard</span></a>
+<a class="text-text-secondary hover:text-white transition-colors p-3 hover:bg-white/5 rounded-full" href="#"><span class="material-symbols-outlined text-2xl">smart_display</span></a>
+<a class="text-text-secondary hover:text-white transition-colors p-3 hover:bg-white/5 rounded-full" href="#"><span class="material-symbols-outlined text-2xl">alternate_email</span></a>
+</div>
+<p class="text-text-secondary/50 text-xs tracking-widest uppercase font-light">© 2024 StreamFlow. All rights reserved.</p>
+</footer>
+</div>
+</body></html>

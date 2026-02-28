@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StreamFlow - Series Details</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#d41142",
+                        "background-light": "#000000",
+                        "background-dark": "#000000",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Spline Sans", sans-serif;
+            background-color: #000000;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #222222; 
+            border-radius: 4px;
+            border: 1px solid #000000;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d41142; 
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 25px -5px rgba(212, 17, 66, 0.4); }
+            50% { box-shadow: 0 0 50px 10px rgba(212, 17, 66, 0.7); }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }.gradient-mask-b {
+            mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+        }
+    </style>
+</head>
+<body class="bg-black min-h-screen flex flex-col overflow-x-hidden text-white selection:bg-primary selection:text-white">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root">
+<div class="layout-container flex h-full grow flex-col">
+<div class="flex flex-1 justify-center w-full">
+<div class="layout-content-container flex flex-col w-full max-w-[1400px] flex-1">
+<header class="flex items-center justify-between whitespace-nowrap bg-gradient-to-b from-black/80 to-transparent backdrop-blur-[2px] sticky top-0 z-50 px-4 lg:px-10 py-5 transition-all duration-500">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-white">
+<div class="size-8 text-primary drop-shadow-[0_0_15px_rgba(212,17,66,0.6)]">
+<svg class="w-full h-full" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M39.5563 34.1455V13.8546C39.5563 15.708 36.8773 17.3437 32.7927 18.3189C30.2914 18.916 27.263 19.2655 24 19.2655C20.737 19.2655 17.7086 18.916 15.2073 18.3189C11.1227 17.3437 8.44365 15.708 8.44365 13.8546V34.1455C8.44365 35.9988 11.1227 37.6346 15.2073 38.6098C17.7086 39.2069 20.737 39.5564 24 39.5564C27.263 39.5564 30.2914 39.2069 32.7927 38.6098C36.8773 37.6346 39.5563 35.9988 39.5563 34.1455Z" fill="currentColor"></path>
+<path clip-rule="evenodd" d="M10.4485 13.8519C10.4749 13.9271 10.6203 14.246 11.379 14.7361C12.298 15.3298 13.7492 15.9145 15.6717 16.3735C18.0007 16.9296 20.8712 17.2655 24 17.2655C27.1288 17.2655 29.9993 16.9296 32.3283 16.3735C34.2508 15.9145 35.702 15.3298 36.621 14.7361C37.3796 14.246 37.5251 13.9271 37.5515 13.8519C37.5287 13.7876 37.4333 13.5973 37.0635 13.2931C36.5266 12.8516 35.6288 12.3647 34.343 11.9175C31.79 11.0295 28.1333 10.4437 24 10.4437C19.8667 10.4437 16.2099 11.0295 13.657 11.9175C12.3712 12.3647 11.4734 12.8516 10.9365 13.2931C10.5667 13.5973 10.4713 13.7876 10.4485 13.8519ZM37.5563 18.7877C36.3176 19.3925 34.8502 19.8839 33.2571 20.2642C30.5836 20.9025 27.3973 21.2655 24 21.2655C20.6027 21.2655 17.4164 20.9025 14.7429 20.2642C13.1498 19.8839 11.6824 19.3925 10.4436 18.7877V34.1275C10.4515 34.1545 10.5427 34.4867 11.379 35.027C12.298 35.6207 13.7492 36.2054 15.6717 36.6644C18.0007 37.2205 20.8712 37.5564 24 37.5564C27.1288 37.5564 29.9993 37.2205 32.3283 36.6644C34.2508 36.2054 35.702 35.6207 36.621 35.027C37.4573 34.4867 37.5485 34.1546 37.5563 34.1275V18.7877ZM41.5563 13.8546V34.1455C41.5563 36.1078 40.158 37.5042 38.7915 38.3869C37.3498 39.3182 35.4192 40.0389 33.2571 40.5551C30.5836 41.1934 27.3973 41.5564 24 41.5564C20.6027 41.5564 17.4164 41.1934 14.7429 40.5551C12.5808 40.0389 10.6502 39.3182 9.20848 38.3869C7.84205 37.5042 6.44365 36.1078 6.44365 34.1455L6.44365 13.8546C6.44365 12.2684 7.37223 11.0454 8.39581 10.2036C9.43325 9.3505 10.8137 8.67141 12.343 8.13948C15.4203 7.06909 19.5418 6.44366 24 6.44366C28.4582 6.44366 32.5797 7.06909 35.657 8.13948C37.1863 8.67141 38.5667 9.3505 39.6042 10.2036C40.6278 11.0454 41.5563 12.2684 41.5563 13.8546Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] font-display">StreamFlow</h2>
+</div>
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-white/80 hover:text-white transition-colors text-sm font-medium leading-normal" href="#">Home</a>
+<a class="text-white font-medium hover:text-white transition-colors text-sm leading-normal drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]" href="#">Series</a>
+<a class="text-white/80 hover:text-white transition-colors text-sm font-medium leading-normal" href="#">Movies</a>
+<a class="text-white/80 hover:text-white transition-colors text-sm font-medium leading-normal" href="#">New &amp; Popular</a>
+<a class="text-white/80 hover:text-white transition-colors text-sm font-medium leading-normal" href="#">My List</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-4 md:gap-8 items-center">
+<label class="flex flex-col min-w-40 !h-10 max-w-64 hidden sm:block">
+<div class="flex w-full flex-1 items-stretch rounded-full h-full bg-white/[0.05] border border-white/5 focus-within:border-white/20 focus-within:bg-white/10 transition-all duration-300">
+<div class="text-white/60 flex items-center justify-center pl-4 rounded-l-full border-r-0">
+<span class="material-symbols-outlined text-lg">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-full text-white focus:outline-0 focus:ring-0 border-none bg-transparent focus:border-none h-full placeholder:text-white/40 px-3 rounded-l-none border-l-0 text-sm font-normal leading-normal" placeholder="Search titles..." value=""/>
+</div>
+</label>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-1 ring-white/10 cursor-pointer shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:ring-white/30 transition-all" data-alt="User profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA1htAcNwV8W69J6LlTtoErJt3Vpk-ZTGN0YMLoeeHIzjidazPJN92GGbBzYFLxAUAswN6E6cXDgZzDNUd_SSwC_rlXyGNgfAa1jfHlFdhkdFEDXzEPIsJXf3CB3147uzDr3jLHz7Gc9NwHto-wrONxVubqy8bAS1YDT6KphL3n7DjVB3Cqz0sEvsGwr0PV5DuprjHw6bebyjjGfWlyZhmBWskN6CWG7XtDYmSmGhZ0ryZR9RT6ISZG0dHUvoT-zF9LErPUIasGTSk");'></div>
+</div>
+</header>
+<div class="@container w-full">
+<div class="pt-0">
+<div class="relative flex min-h-[85vh] flex-col gap-6 items-start justify-end px-4 pb-24 pt-40 md:px-12 lg:px-20 group w-full" data-alt="Futuristic cyberpunk city skyline at night with neon lights" style="background-image: linear-gradient(to top, #000000 0%, rgba(0, 0, 0, 0.95) 15%, rgba(0, 0, 0, 0.8) 25%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0) 100%), url('https://lh3.googleusercontent.com/aida-public/AB6AXuCQ-FZJuGGWeeC9_YFwQFruenKLP0Bp3LBSWAcCn2RPCIu5PDVxs2JrCPWcjuPH0s9PiddW23qDH5HyLMxFZ4qI2jqUH8MH4KqdULAIXmayytfYA8N3vHEsIM4peCtGU__JXmsqBu6zff9hf9finOA_7_mykC2UeMsdvzAnWI6Ey2XpkAxAp7HFpPni9k37DSdY04kQxSvYyL7If9PZM5y_Gtb6g7lOCNQYEdU6Iy2HyztoLqFODsC7FBiJI_5SZ-wqZIS3b5CAa6c'); background-size: cover; background-position: center;">
+<div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+<div class="absolute inset-0 bg-black/10 mix-blend-multiply"></div>
+<div class="relative z-10 flex flex-col gap-6 text-left max-w-4xl animate-fade-in-up">
+<div class="flex items-center gap-3">
+<span class="bg-primary/90 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-[0_0_20px_rgba(212,17,66,0.6)] border border-primary/20">Series</span>
+<span class="border border-white/10 bg-black/40 backdrop-blur-md text-white/90 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">4K HDR</span>
+<span class="border border-white/10 bg-black/40 backdrop-blur-md text-white/90 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest">Dolby Atmos</span>
+</div>
+<h1 class="text-white text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] tracking-[-0.04em] drop-shadow-2xl bg-clip-text text-transparent bg-gradient-to-b from-white to-white/70">
+                                        Chronicles of the Void
+                                    </h1>
+<div class="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm md:text-base font-medium text-gray-200">
+<span class="text-primary font-bold drop-shadow-[0_0_12px_rgba(212,17,66,0.8)]">98% Match</span>
+<span class="font-light text-white/60">2023</span>
+<span class="font-light text-white/60">4 Seasons</span>
+<span class="w-1 h-1 bg-white/40 rounded-full"></span>
+<span>Sci-Fi Thriller</span>
+<span class="w-1 h-1 bg-white/40 rounded-full"></span>
+<span>Cyberpunk</span>
+</div>
+<p class="text-gray-300 text-lg md:text-xl max-w-3xl line-clamp-3 md:line-clamp-none font-normal leading-loose drop-shadow-lg tracking-wide">
+                                        In a future where humanity has colonized the edges of the galaxy, a lone detective uncovers a conspiracy that threatens the fragile peace between the colonies. As he delves deeper, he discovers that the void itself may be alive and watching.
+                                    </p>
+<div class="flex flex-wrap items-center gap-6 mt-8">
+<button class="group relative flex items-center justify-center gap-3 h-16 px-10 rounded-full bg-primary hover:bg-[#ff1e53] text-white text-lg font-bold transition-all duration-300 shadow-[0_0_30px_-5px_rgba(212,17,66,0.5)] animate-pulse-glow hover:scale-105 active:scale-95 z-10">
+<span class="material-symbols-outlined fill-current text-3xl group-hover:scale-110 transition-transform">play_arrow</span>
+<span class="tracking-wide">Resume Episode</span>
+</button>
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center gap-2 h-14 px-8 rounded-full bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-xl border border-white/10 hover:border-white/20 text-white text-base font-semibold transition-all duration-300">
+<span class="material-symbols-outlined">add</span>
+<span>My List</span>
+</button>
+<button class="flex items-center justify-center size-14 rounded-full bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-xl border border-white/10 hover:border-white/20 text-white transition-all duration-300 group">
+<span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">thumb_up</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col lg:flex-row gap-12 px-4 lg:px-12 pb-24 -mt-10 relative z-20">
+<div class="flex-1">
+<div class="flex items-end justify-between mb-8 border-b border-white/5 pb-4">
+<h2 class="text-white tracking-tight text-3xl font-bold">Episodes</h2>
+<div class="relative">
+<select class="appearance-none bg-white/[0.03] border border-white/10 rounded-full pl-5 pr-10 py-2 text-sm text-white font-medium hover:bg-white/[0.06] focus:border-primary focus:ring-1 focus:ring-primary outline-none cursor-pointer backdrop-blur-sm transition-all">
+<option>Season 1</option>
+<option>Season 2</option>
+<option>Season 3</option>
+<option>Season 4</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none text-sm">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-6">
+<div class="group flex flex-col md:flex-row gap-6 p-5 rounded-2xl bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all duration-500 backdrop-blur-sm cursor-pointer hover:shadow-[0_0_50px_-20px_rgba(0,0,0,1)]">
+<div class="relative w-full md:w-80 aspect-video shrink-0 rounded-xl overflow-hidden bg-black shadow-2xl group-hover:shadow-[0_0_30px_-5px_rgba(212,17,66,0.25)] transition-all duration-500 z-10">
+<img class="object-cover w-full h-full transform transition-transform duration-700 ease-out group-hover:scale-110 group-hover:rotate-1" data-alt="Dark neon lit corridor sci-fi scene" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6kN_eYof3ItgORgdw9Xx_cNBXCar3h_AFr74_DWFYp4FKGdRzxJeByprHKN5okOlMH-l9xN6fOBwXmMEmkr9VsXQRzIMewQ1r2k3oXwRKuyzKdWekhLcezHOzPNiXIC2L3fHWc3lsb1BHF4bjRtxzdv6DFsT4qxiAG0ok57qMxhEPS7AxsMfyPpow_WhfWU8yLSd77znQFX7MlYev0FCyWUSq1ayO20p4CSk8jLbmN_Peb_pebDM215E8A7h7y5s-FZUVthC_jeI"/>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-500"></div>
+<div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[2px]">
+<span class="material-symbols-outlined text-white text-6xl drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] scale-75 group-hover:scale-100 transition-transform duration-300">play_circle</span>
+</div>
+<div class="absolute bottom-3 right-3 px-2 py-0.5 bg-black/80 rounded-md text-[11px] font-bold text-white/90 tracking-wide backdrop-blur-md border border-white/5">48m</div>
+<div class="absolute bottom-0 left-0 w-full h-1 bg-white/5">
+<div class="h-full bg-primary w-[85%] shadow-[0_0_15px_rgba(212,17,66,0.9)]"></div>
+</div>
+</div>
+<div class="flex flex-col justify-center gap-3 flex-1 py-1">
+<div class="flex justify-between items-center w-full">
+<h3 class="text-white text-xl font-bold group-hover:text-primary transition-colors duration-300 leading-tight">1. The Awakening</h3>
+</div>
+<p class="text-gray-400 text-base line-clamp-3 leading-relaxed font-normal group-hover:text-gray-300 transition-colors">The detective wakes up in a strange facility with no memory of how he got there. As he explores, he realizes he's not on his home planet anymore, and the gravity feels... wrong.</p>
+</div>
+<div class="flex md:flex-col justify-between items-center pl-2 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<button class="p-3 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+<div class="group flex flex-col md:flex-row gap-6 p-5 rounded-2xl bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all duration-500 backdrop-blur-sm cursor-pointer hover:shadow-[0_0_50px_-20px_rgba(0,0,0,1)]">
+<div class="relative w-full md:w-80 aspect-video shrink-0 rounded-xl overflow-hidden bg-black shadow-2xl group-hover:shadow-[0_0_30px_-5px_rgba(212,17,66,0.25)] transition-all duration-500 z-10">
+<img class="object-cover w-full h-full transform transition-transform duration-700 ease-out group-hover:scale-110 group-hover:rotate-1" data-alt="Abstract colorful gradient texture representing digital space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUjI4awWr1xvhCxi_qfrz0JTtzCbGAv3JKKcIi8sLJX8AiAFsuKroQcOpPcU7FU5GEgHfTv3Rm9IoLnvfL1TJZwX3l38colY2cx7JpbmXL82eIugFR0PEqtLdD2ohFZLa_He8h438gWSf9p2IERvzxiu1JMvmKt_VKsQtcnX3CfFPRE09vveU2LbB-EQ0QB-6hOvM_ueRgtDHi4N7YzdE6Gxr2QVYvAnv-cINX--XpQRbqkvAdnKbhC7DXmvGymXW6C2zFOmD60uw"/>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-500"></div>
+<div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[2px]">
+<span class="material-symbols-outlined text-white text-6xl drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] scale-75 group-hover:scale-100 transition-transform duration-300">play_circle</span>
+</div>
+<div class="absolute bottom-3 right-3 px-2 py-0.5 bg-black/80 rounded-md text-[11px] font-bold text-white/90 tracking-wide backdrop-blur-md border border-white/5">52m</div>
+<div class="absolute bottom-0 left-0 w-full h-1 bg-white/5">
+<div class="h-full bg-primary w-[30%] shadow-[0_0_15px_rgba(212,17,66,0.9)]"></div>
+</div>
+</div>
+<div class="flex flex-col justify-center gap-3 flex-1 py-1">
+<div class="flex justify-between items-center w-full">
+<h3 class="text-white text-xl font-bold group-hover:text-primary transition-colors duration-300 leading-tight">2. Signals from the Deep</h3>
+</div>
+<p class="text-gray-400 text-base line-clamp-3 leading-relaxed font-normal group-hover:text-gray-300 transition-colors">A mysterious transmission is intercepted by the colony's radar. Is it a distress call or a warning? The team investigates the source only to find silence.</p>
+</div>
+<div class="flex md:flex-col justify-between items-center pl-2 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<button class="p-3 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+<div class="group flex flex-col md:flex-row gap-6 p-5 rounded-2xl bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all duration-500 backdrop-blur-sm cursor-pointer hover:shadow-[0_0_50px_-20px_rgba(0,0,0,1)]">
+<div class="relative w-full md:w-80 aspect-video shrink-0 rounded-xl overflow-hidden bg-black shadow-2xl group-hover:shadow-[0_0_30px_-5px_rgba(212,17,66,0.25)] transition-all duration-500 z-10">
+<img class="object-cover w-full h-full transform transition-transform duration-700 ease-out group-hover:scale-110 group-hover:rotate-1" data-alt="Starry night sky and nebula space texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJChPFfvzxFTZInu_gq1jvz3N9anCBZiuSyzqDP7izriQHoRB9Jf1PJiykJmH-zRECinjzctCUPx7hKbxEzc_wjpV-IBSNmR0pRLoVhbZovQqM_-Crwpzf36zXKRXdBNgh7oyZhrgyj4ZVIFRgIucB1I7za1GP00MyGSs0gWO1x85AhGv1LZc_hF7RM3-weakdQlxky6kFSSS21zFHqt37eHDXYxpK8lQCDlzSFzThqsrxNYp0WFZR1BvFKZkq-quxvENrN5asDQQ"/>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-500"></div>
+<div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[2px]">
+<span class="material-symbols-outlined text-white text-6xl drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] scale-75 group-hover:scale-100 transition-transform duration-300">play_circle</span>
+</div>
+<div class="absolute bottom-3 right-3 px-2 py-0.5 bg-black/80 rounded-md text-[11px] font-bold text-white/90 tracking-wide backdrop-blur-md border border-white/5">45m</div>
+</div>
+<div class="flex flex-col justify-center gap-3 flex-1 py-1">
+<div class="flex justify-between items-center w-full">
+<h3 class="text-white text-xl font-bold group-hover:text-primary transition-colors duration-300 leading-tight">3. Rogue AI</h3>
+</div>
+<p class="text-gray-400 text-base line-clamp-3 leading-relaxed font-normal group-hover:text-gray-300 transition-colors">The central computer system begins to exhibit strange behavior, locking down sectors of the city. A race against time to regain control before life support fails.</p>
+</div>
+<div class="flex md:flex-col justify-between items-center pl-2 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<button class="p-3 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+<div class="group flex flex-col md:flex-row gap-6 p-5 rounded-2xl bg-white/[0.01] hover:bg-white/[0.03] border border-white/5 hover:border-white/10 transition-all duration-500 backdrop-blur-sm cursor-pointer hover:shadow-[0_0_50px_-20px_rgba(0,0,0,1)]">
+<div class="relative w-full md:w-80 aspect-video shrink-0 rounded-xl overflow-hidden bg-black shadow-2xl group-hover:shadow-[0_0_30px_-5px_rgba(212,17,66,0.25)] transition-all duration-500 z-10">
+<img class="object-cover w-full h-full transform transition-transform duration-700 ease-out group-hover:scale-110 group-hover:rotate-1" data-alt="Silhouette of a person standing against a red lit fog background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkNisvL5yPN0x54I6WxAKF_moGt-iwIqeA1i3PzfqIpr5IbKjH-tBe0TyAu_xM67WVL0CdqcnjWV2bM8QtUJ27C9WQ0QkYoF9VP0LJPuxRt8rP09GcrVIdEuK0VawFMOf7atkfCxif-9x3Iqd97bb1Yw9MRD5w2xj6wd2SHtoodOgDgjVdtRcjY-FfhMYHYKap9Q8MIWfYKNyKYCPI1ccc9MVj5pOXh8UeXl1CzcmtWSbCEJRX8kTSDkN1DboKo1IHytpO_vJkJYA"/>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-500"></div>
+<div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 backdrop-blur-[2px]">
+<span class="material-symbols-outlined text-white text-6xl drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] scale-75 group-hover:scale-100 transition-transform duration-300">play_circle</span>
+</div>
+<div class="absolute bottom-3 right-3 px-2 py-0.5 bg-black/80 rounded-md text-[11px] font-bold text-white/90 tracking-wide backdrop-blur-md border border-white/5">50m</div>
+</div>
+<div class="flex flex-col justify-center gap-3 flex-1 py-1">
+<div class="flex justify-between items-center w-full">
+<h3 class="text-white text-xl font-bold group-hover:text-primary transition-colors duration-300 leading-tight">4. The Betrayal</h3>
+</div>
+<p class="text-gray-400 text-base line-clamp-3 leading-relaxed font-normal group-hover:text-gray-300 transition-colors">Trust is shattered when a member of the crew is found communicating with the enemy faction. Paranoia spreads through the ranks as everyone becomes a suspect.</p>
+</div>
+<div class="flex md:flex-col justify-between items-center pl-2 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<button class="p-3 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full lg:w-80 shrink-0 flex flex-col gap-10 pt-2">
+<div>
+<h3 class="text-gray-500 font-bold mb-6 uppercase tracking-widest text-xs">Cast &amp; Crew</h3>
+<div class="flex flex-col gap-5">
+<div class="flex items-center gap-4 group cursor-pointer">
+<div class="size-12 rounded-full bg-gray-800 bg-cover bg-center ring-1 ring-white/10 group-hover:ring-primary transition-all duration-300" data-alt="Portrait of a male actor" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAv2xIil9uwYL4S34NcnT4qWGrBQwp-HlfbjIz5k8yjTcR_bGlT3bIYxnqroia3AAL3HMHxFpPiuZgz289qPyfa6WQUELzYsl5bs922jFGyc3Cgid_sRkZj3OJG6wDpsKFFH0CIQge7APFxzNYn84zD6HfEzX96AaX39xKQDikrg667uYVUm9oeuFzKi70uHQAIatV1OYX2er9Dko7LchqTH8iPels3OxKlz7tQvz9iKsxJT_6RpKQQ674CsQMj1crvyzVewk2Vydw')"></div>
+<div>
+<div class="text-white text-base font-semibold group-hover:text-primary transition-colors">John Doe</div>
+<div class="text-gray-500 text-sm">Detective K</div>
+</div>
+</div>
+<div class="flex items-center gap-4 group cursor-pointer">
+<div class="size-12 rounded-full bg-gray-800 bg-cover bg-center ring-1 ring-white/10 group-hover:ring-primary transition-all duration-300" data-alt="Portrait of a female actor" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDoalXIhkXlG3TZVZpyRZgh-Ubrq7UY9OnZfoO47IH2BBEn-WxRlTpHFfCgK0yIOysig6CRqV1sRgafR7ZOba_TXtDVQkRQmYn2NvKYgbB3ucATS-RWKNcyfvhgk6gyr810swba8tYax8eVKEtDYNGCKfexQpahk3oubKwLW15LIpzsV8NnFghEc76tucjvSIu7C5_vimKA26D-GVULoy0x7u8tuEhD3_i1MuR6SxzGxN6E1X2jksq_t3aG3zQPbg73wgulHr5ZMUM')"></div>
+<div>
+<div class="text-white text-base font-semibold group-hover:text-primary transition-colors">Jane Smith</div>
+<div class="text-gray-500 text-sm">Commander Vex</div>
+</div>
+</div>
+<div class="flex items-center gap-4 group cursor-pointer">
+<div class="size-12 rounded-full bg-gray-800 bg-cover bg-center ring-1 ring-white/10 group-hover:ring-primary transition-all duration-300" data-alt="Portrait of a male actor smiling" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB0Vlg2EMPcnqiWCKwRD2eHk1h_oCHdQK_i4--iUIBK5dHoH9njSoenW3Rv5TcAH-S1vTiVtueTUy0eyy89MwD7qQvvT-Kmh4uQlILSoMdOA6MZdsrvoSEfrh91LUS0aPTy4ABY2Ik2adSnLqSPRaR60hhQhh0t2MOWKt3sSR-QNJINP9cNhhCJ7e4USo6OE3XdkiCbciHvmOsaNGjBfz7z6EQCkg7jW2qfeyqKLDZZet_ZOS1VGCd3x-8mAjWxtZU_N03JiMZ70O0')"></div>
+<div>
+<div class="text-white text-base font-semibold group-hover:text-primary transition-colors">Mike Ross</div>
+<div class="text-gray-500 text-sm">Tech Specialist</div>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full h-px bg-white/5"></div>
+<div>
+<h3 class="text-gray-500 font-bold mb-6 uppercase tracking-widest text-xs">About</h3>
+<div class="flex flex-col gap-6 text-sm">
+<div>
+<span class="text-gray-500 block text-xs mb-1">Director</span>
+<span class="text-white text-base">Christopher Nolan</span>
+</div>
+<div>
+<span class="text-gray-500 block text-xs mb-1">Genres</span>
+<span class="text-white text-base">Sci-Fi, Thriller, Mystery</span>
+</div>
+<div>
+<span class="text-gray-500 block text-xs mb-2">Maturity Rating</span>
+<div class="flex items-center gap-3">
+<span class="border border-white/20 px-2 py-0.5 text-xs font-bold rounded text-white bg-white/5">TV-MA</span>
+<span class="text-white/60 text-xs">Violence, Language</span>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full h-px bg-white/5"></div>
+<div>
+<h3 class="text-gray-500 font-bold mb-6 uppercase tracking-widest text-xs">More Like This</h3>
+<div class="grid grid-cols-2 gap-4">
+<div class="aspect-[2/3] rounded-lg bg-cover bg-center hover:opacity-100 opacity-70 cursor-pointer transition-all duration-300 shadow-none hover:shadow-[0_0_25px_-5px_rgba(255,255,255,0.15)] hover:scale-105" data-alt="Movie poster with red tones" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCjkuvhzC48cbsRFwu-XRMOUn4UjEDh6cH3FrAW7hTigkSUT65XceRUmwgSxr8kdNzgjraYTZKEQzcK0uTtOUb10Hb3VP28rPIgZxUPtgzDJmQUT_qFEqVrM6b3NH9BIYEYcXUKWqrxi4a23lmjXkfLIBjpzQKBz4mzND-CdXAI0BLpCD8cGhmEsAHNGXeh51pnig0rxb2d8i_fcf6TOTeiFgbZLmjEWjYr9hYkVzbuWa_4byQI-JtvPLBo0GbLvSTvMFv2j6QlZQM')"></div>
+<div class="aspect-[2/3] rounded-lg bg-cover bg-center hover:opacity-100 opacity-70 cursor-pointer transition-all duration-300 shadow-none hover:shadow-[0_0_25px_-5px_rgba(255,255,255,0.15)] hover:scale-105" data-alt="Movie poster with dark blue tones" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCX_iyWwK5WEDN6Nq4lUQNXIrvb74pM2Ip3G6MXqTkVIrtmfUjUHGITO2fyqXWb8Y7gnoNHq1WKSi5IOJxJ48-x_apFxiqF606c4ue240IwMHhBMop4YZoR352n4WnIQFZqXPOX3-Ejm0nqqesRUckAZdhhU7qoS6bfwY-ovy4vuEzfExL9CU0iz-l6f9DnaL2gl9U1uXajtwfMPn9xQ2ahw8PjVQhekv6lsfbjIVKS3L9Xd3LrEdTJ2ctxKeAQNWbIwxqayfPjSmc')"></div>
+<div class="aspect-[2/3] rounded-lg bg-cover bg-center hover:opacity-100 opacity-70 cursor-pointer transition-all duration-300 shadow-none hover:shadow-[0_0_25px_-5px_rgba(255,255,255,0.15)] hover:scale-105" data-alt="Movie poster with futuristic skull" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuALwu_72KebVScUZJkgUQKfUlnMgXWlm5WuOp-ceJ7QY9_m7mAm4lXiR-y1avhv3Fj4iJDotmsBu83G89K5MpiiapuGTtLc1bNN0QGAVJMXvcTsyhbW7WBRNWX5BVH55IOuVMHhIxro28XjlyGHMuhs94LL3N-mJpCbn_ii7a3gT49vr1tsNTUl3QshS3kjr7JmOYIrf8oza6JstG3dFSU43EVzOYubNZi_VlY27z3OaI7IQPEavc1QL4m4bOuU-SK5INC99FG_MHs')"></div>
+<div class="aspect-[2/3] rounded-lg bg-cover bg-center hover:opacity-100 opacity-70 cursor-pointer transition-all duration-300 shadow-none hover:shadow-[0_0_25px_-5px_rgba(255,255,255,0.15)] hover:scale-105" data-alt="Movie poster abstract architecture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDlKPTyFwN9kLEiI7njr5VMIi2QUAus-Ub1tENOxVbl8cNyd_ECEJQw-R43Emxe4QTp-jqC975FoM8nYjJbRnGO-44WQEje2OOCFU37IGx1hD7ZLDvHXwkgyROL_g7kLav4Rlt9nFVcENGWBZgWFaAyQ8Vl4ywoTkkegM4QmLUjP-rqjscmEUZqCaN5qXK3lwQlZbOBQ1lWQ_-C0aOXkwJyFLXL6tDXDmsK9Z9Qe6rHJ_kkfSu9bP1mcDLJ8_97NFqFzAE-y26hWMs')"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

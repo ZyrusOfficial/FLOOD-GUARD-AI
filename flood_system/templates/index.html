@@ -426,50 +426,613 @@
         </div>
     </footer>
 
-    <!-- Settings Modal -->
+
+    <!-- Settings Modal (Full Screen Dashboard) -->
     <div id="settingsModal"
-        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-white dark:bg-panel-dark border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl w-[90%] max-w-md overflow-hidden transform scale-95 transition-transform duration-300"
-            id="settingsModalContent">
+        class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300 p-2 sm:p-6">
+        <div id="settingsModalContent"
+            class="bg-background-light dark:bg-[#0b0e14] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl w-full h-full max-w-7xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col md:flex-row shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+
+            <!-- Sidebar -->
             <div
-                class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
-                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    <span class="material-icons text-primary text-sm">settings</span> System Settings
-                </h3>
-                <button onclick="closeSettingsModal()"
-                    class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
-                    <span class="material-icons">close</span>
-                </button>
-            </div>
-            <div class="p-5 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">KDE Connect Device
-                        ID</label>
-                    <input type="text" id="cfgDeviceId"
-                        class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded p-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-slate-400"
-                        placeholder="e.g. Y18">
-                    <p class="text-[10px] text-slate-500 mt-1">Run <code
-                            class="bg-slate-100 dark:bg-slate-800 px-1 rounded">kdeconnect-cli -l</code> on host PC to
-                        find this.</p>
+                class="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111318] flex flex-col justify-between hidden md:flex h-full">
+                <div class="flex flex-col gap-4">
+                    <div class="flex gap-3 items-center px-4 py-6 border-b border-slate-200 dark:border-slate-800">
+                        <div
+                            class="w-8 h-8 rounded bg-primary flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(19,91,236,0.5)]">
+                            <span class="material-icons text-white text-sm">water_drop</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <h1 class="text-slate-900 dark:text-white text-base font-bold leading-none tracking-wide">
+                                HYDRO<span class="text-primary">GUARD</span></h1>
+                            <p class="text-slate-500 dark:text-slate-400 text-xs font-normal mt-1">Settings Dashboard
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2 px-3 mt-2">
+                        <button onclick="switchTab('system')" id="tab-btn-system"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary transition-colors text-left group">
+                            <span class="material-icons text-[20px]">memory</span>
+                            <span class="text-sm font-medium">System</span>
+                        </button>
+                        <button onclick="switchTab('camera')" id="tab-btn-camera"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left group">
+                            <span class="material-icons text-[20px]">videocam</span>
+                            <span class="text-sm font-medium">Camera Calibration</span>
+                        </button>
+                        <button onclick="switchTab('alerts')" id="tab-btn-alerts"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left group">
+                            <span class="material-icons text-[20px]">warning</span>
+                            <span class="text-sm font-medium">Alert Thresholds</span>
+                        </button>
+                        <button onclick="switchTab('sms')" id="tab-btn-sms"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left group">
+                            <span class="material-icons text-[20px]">sms</span>
+                            <span class="text-sm font-medium">SMS Recipients</span>
+                        </button>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">SMS Recipients (Comma
-                        separated)</label>
-                    <textarea id="cfgRecipients" rows="3"
-                        class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded p-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-slate-400 font-mono"
-                        placeholder="+639123456789, +1234567890"></textarea>
+                <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+                    <button onclick="closeSettingsModal()"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium transition-colors">
+                        <span class="material-icons text-[18px]">close</span>
+                        Close Settings
+                    </button>
                 </div>
             </div>
-            <div
-                class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex justify-end gap-3">
-                <button onclick="closeSettingsModal()"
-                    class="px-4 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors">Cancel</button>
-                <button onclick="saveSettings()"
-                    class="px-4 py-1.5 text-xs font-bold text-white bg-primary hover:bg-blue-600 rounded shadow-sm transition-colors flex items-center gap-1">
-                    <span class="material-icons text-[14px]">save</span> Save
-                </button>
+
+            <!-- Main Content Area -->
+            <div class="flex-1 flex flex-col h-full overflow-hidden relative bg-slate-50 dark:bg-[#0b0e14]">
+                <!-- Mobile Header -->
+                <div
+                    class="md:hidden flex items-center justify-between p-4 bg-white dark:bg-[#111318] border-b border-slate-200 dark:border-slate-800 shrink-0">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded bg-primary flex items-center justify-center shrink-0">
+                            <span class="material-icons text-white text-[10px]">water_drop</span>
+                        </div>
+                        <span class="font-bold text-lg dark:text-white leading-none tracking-tight">HYDRO<span
+                                class="text-primary">GUARD</span></span>
+                    </div>
+                    <div class="flex gap-2">
+                        <select id="mobileTabSelect" onchange="switchTab(this.value)"
+                            class="bg-slate-100 dark:bg-slate-800 border-none text-xs rounded-lg py-1 pl-2 pr-6 text-slate-700 dark:text-slate-300 focus:ring-0">
+                            <option value="system">System</option>
+                            <option value="camera">Camera Calibration</option>
+                            <option value="alerts">Alert Thresholds</option>
+                            <option value="sms">SMS Recipients</option>
+                        </select>
+                        <button onclick="closeSettingsModal()"
+                            class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                            <span class="material-icons text-[18px] block">close</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TAB: SYSTEM -->
+                <div id="tab-system" class="settings-tab-panel flex-1 overflow-y-auto w-full h-full">
+                    <div class="p-4 md:p-8 lg:p-10 max-w-5xl mx-auto">
+                        <header class="mb-8">
+                            <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">System
+                                Configuration</h2>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">Monitor hardware performance and
+                                configure core connection settings.</p>
+                        </header>
+
+                        <!-- Model Selection -->
+                        <section
+                            class="bg-white dark:bg-[#1a202c] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm mb-8">
+                            <div
+                                class="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#111318]/50">
+                                <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span class="material-icons text-purple-500 text-[20px]">psychology</span> Detection
+                                    Model
+                                </h3>
+                                <p class="text-xs text-slate-500 mt-1">Select which AI engine powers flood detection.
+                                    Only one model is loaded at a time for energy efficiency.</p>
+                            </div>
+                            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label id="modelCard-canny" onclick="selectModel('canny')"
+                                    class="cursor-pointer rounded-xl border-2 border-primary bg-primary/5 p-5 flex gap-4 items-start transition-all hover:shadow-lg relative">
+                                    <div
+                                        class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center">
+                                        <div id="modelDot-canny" class="w-2.5 h-2.5 rounded-full bg-primary"></div>
+                                    </div>
+                                    <span class="material-icons text-primary text-3xl mt-0.5">auto_graph</span>
+                                    <div>
+                                        <h4 class="font-bold text-slate-900 dark:text-white text-sm">Canny/Hough Edge
+                                            Detection</h4>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Lightweight CV
+                                            pipeline. Detects water surface using edge detection + HoughLinesP. Requires
+                                            ROI calibration.</p>
+                                        <div class="flex gap-2 mt-2">
+                                            <span
+                                                class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold">LOW
+                                                CPU</span>
+                                            <span
+                                                class="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold">NEEDS
+                                                ROI</span>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label id="modelCard-yolo" onclick="selectModel('yolo')"
+                                    class="cursor-pointer rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-transparent p-5 flex gap-4 items-start transition-all hover:shadow-lg relative">
+                                    <div
+                                        class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center">
+                                        <div id="modelDot-yolo" class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
+                                    </div>
+                                    <span class="material-icons text-orange-500 text-3xl mt-0.5">hub</span>
+                                    <div>
+                                        <h4 class="font-bold text-slate-900 dark:text-white text-sm">YOLOv8 Water
+                                            Segmentation</h4>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">AI-powered water area
+                                            detection using a trained YOLOv8n model. Uses polygon intersection for level
+                                            measurement.</p>
+                                        <div class="flex gap-2 mt-2">
+                                            <span
+                                                class="text-[10px] px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 font-semibold">GPU/CPU</span>
+                                            <span
+                                                class="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-semibold">NO
+                                                ROI</span>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </section>
+
+                        <!-- YOLO-Specific Settings (hidden when Canny is active) -->
+                        <section id="yoloSettings"
+                            class="bg-white dark:bg-[#1a202c] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm mb-8 hidden">
+                            <div
+                                class="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#111318]/50">
+                                <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <span class="material-icons text-orange-500 text-[20px]">hub</span> YOLO
+                                    Configuration
+                                </h3>
+                            </div>
+                            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="flex flex-col gap-4">
+                                    <label class="flex flex-col gap-1.5">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Reference
+                                            Line Start (x, y)</span>
+                                        <div class="flex gap-2">
+                                            <input id="cfgYoloLineStartX"
+                                                class="flex-1 rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                                type="number" value="1094" placeholder="X" />
+                                            <input id="cfgYoloLineStartY"
+                                                class="flex-1 rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                                type="number" value="231" placeholder="Y" />
+                                        </div>
+                                    </label>
+                                    <label class="flex flex-col gap-1.5">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Reference
+                                            Line End (x, y)</span>
+                                        <div class="flex gap-2">
+                                            <input id="cfgYoloLineEndX"
+                                                class="flex-1 rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                                type="number" value="1083" placeholder="X" />
+                                            <input id="cfgYoloLineEndY"
+                                                class="flex-1 rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                                type="number" value="403" placeholder="Y" />
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="flex flex-col gap-4">
+                                    <label class="flex flex-col gap-1.5">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Pixels per
+                                            Meter</span>
+                                        <input id="cfgYoloPxPerMeter"
+                                            class="rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                            type="number" value="15" />
+                                    </label>
+                                    <label class="flex flex-col gap-1.5">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Tip Height
+                                            (meters)</span>
+                                        <input id="cfgYoloTipHeight"
+                                            class="rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                            type="number" step="0.1" value="15" />
+                                    </label>
+                                    <label class="flex flex-col gap-1.5">
+                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Minimum
+                                            Confidence (%)</span>
+                                        <input id="cfgYoloConfidence"
+                                            class="rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                            type="number" step="1" min="1" max="100" value="50" />
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="px-6 pb-6 flex justify-end">
+                                <button onclick="saveYoloSettings()"
+                                    class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-orange-500/20 flex items-center gap-2">
+                                    <span class="material-icons text-[18px]">save</span> Save YOLO Settings
+                                </button>
+                            </div>
+                        </section>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <section
+                                class="bg-white dark:bg-[#1a202c] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                                <div
+                                    class="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-[#111318]/50">
+                                    <h3
+                                        class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                        <span class="material-icons text-primary text-[20px]">videocam</span> DroidCam
+                                        Connection
+                                    </h3>
+                                </div>
+                                <div class="p-6 flex flex-col gap-5">
+                                    <div class="flex flex-col gap-4">
+                                        <label class="flex flex-col gap-1.5">
+                                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Device
+                                                IP Address & Port</span>
+                                            <div class="flex gap-2">
+                                                <div class="relative flex-1">
+                                                    <span
+                                                        class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
+                                                        <span class="material-icons text-[18px]">lan</span>
+                                                    </span>
+                                                    <input id="cfgDroidCamIp"
+                                                        class="w-full rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 pl-10 pr-4 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-slate-400 text-sm font-mono"
+                                                        type="text" value="192.168.1.175" />
+                                                </div>
+                                                <div class="relative w-24">
+                                                    <input id="cfgDroidCamPort"
+                                                        class="w-full rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-sm font-mono text-center"
+                                                        type="text" value="4747" />
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div
+                                        class="rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 p-3 flex gap-3 items-start">
+                                        <span class="material-icons text-blue-600 dark:text-blue-400 mt-0.5">info</span>
+                                        <div>
+                                            <h4 class="text-sm font-semibold text-blue-900 dark:text-blue-100">Video
+                                                Source URL</h4>
+                                            <p
+                                                class="text-[10px] text-blue-700 dark:text-blue-300 mt-1 font-mono break-all">
+                                                http://<span id="previewIp">192.168.1.175</span>:<span
+                                                    id="previewPort">4747</span>/video</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end pt-2">
+                                        <button onclick="saveCameraSettings()"
+                                            class="bg-primary hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-primary/20 flex items-center gap-2">
+                                            <span class="material-icons text-[18px]">save</span> Save Camera Settings
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section
+                                class="bg-white dark:bg-[#1a202c] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm h-fit">
+                                <div
+                                    class="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#111318]/50">
+                                    <h3
+                                        class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                        <span class="material-icons text-emerald-500 text-[20px]">monitor_heart</span>
+                                        System Diagnostics
+                                    </h3>
+                                </div>
+                                <div class="p-6">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div
+                                            class="bg-slate-50 dark:bg-[#111318] p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                            <p
+                                                class="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">
+                                                Status</p>
+                                            <p class="text-lg font-bold text-emerald-500 flex items-center gap-1">
+                                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                Active
+                                            </p>
+                                        </div>
+                                        <div
+                                            class="bg-slate-50 dark:bg-[#111318] p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                            <p
+                                                class="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">
+                                                Engine</p>
+                                            <p class="text-lg font-bold text-slate-900 dark:text-white">Running</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: CAMERA CALIBRATION -->
+                <div id="tab-camera" class="settings-tab-panel flex-1 flex flex-col hidden h-full w-full">
+                    <header
+                        class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#111318] shrink-0">
+                        <div>
+                            <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Calibration Mode
+                            </h1>
+                            <p class="text-xs text-slate-500 dark:text-[#9da6b9]">Adjust threshold lines to configure
+                                alert levels.</p>
+                        </div>
+                    </header>
+                    <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
+                        <div class="flex-1 p-4 bg-slate-900 relative flex items-center justify-center overflow-hidden">
+                            <div
+                                class="relative w-full max-w-3xl aspect-video bg-black rounded-lg overflow-hidden shadow-2xl ring-1 ring-slate-800 shadow-[0_0_30px_rgba(0,0,0,1)]">
+                                <img id="calibVideoFeed" src="/video_feed"
+                                    class="absolute inset-0 w-full h-full object-contain opacity-60 pointer-events-none" />
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent pointer-events-none">
+                                </div>
+                                <!-- Interactive ROI Canvas -->
+                                <canvas id="roiCanvas"
+                                    class="absolute inset-0 w-full h-full object-contain cursor-crosshair z-10 pointer-events-auto"
+                                    title="Click and drag to draw Water ROI"></canvas>
+
+                                <div
+                                    class="absolute top-3 left-3 bg-black/80 backdrop-blur text-white px-2 py-1 rounded text-[10px] font-mono border border-white/20">
+                                    LIVE PREVIEW DEMO
+                                </div>
+
+                                <!-- Decorative lines -->
+                                <div class="absolute w-full flex items-center border-t border-dashed border-red-500/50"
+                                    style="top: 20%;">
+                                    <div
+                                        class="absolute right-2 -top-3 bg-red-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded">
+                                        CRITICAL</div>
+                                </div>
+                                <div class="absolute w-full flex items-center border-t border-dashed border-orange-500/50"
+                                    style="top: 35%;">
+                                    <div
+                                        class="absolute right-2 -top-3 bg-orange-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded">
+                                        DANGER</div>
+                                </div>
+                                <div class="absolute w-full flex items-center border-t border-dashed border-yellow-500/50"
+                                    style="top: 55%;">
+                                    <div
+                                        class="absolute right-2 -top-3 bg-yellow-600 text-black text-[8px] font-bold px-1.5 py-0.5 rounded">
+                                        WARNING</div>
+                                </div>
+                                <!-- Instruction Overlay -->
+                                <div id="roiInstruction"
+                                    class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur text-white/80 px-4 py-1.5 rounded-full text-xs pointer-events-none flex items-center gap-2 border border-white/10 z-20">
+                                    <span class="material-icons text-[14px] text-primary">touch_app</span>
+                                    Click and drag to set Region of Interest
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="w-full lg:w-80 flex-shrink-0 bg-white dark:bg-[#111318] border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 flex flex-col h-[40vh] lg:h-auto overflow-y-auto">
+                            <div class="p-5 flex-1">
+                                <h2
+                                    class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center justify-between">
+                                    Threshold Values
+                                    <span class="bg-primary/10 text-primary px-2 py-0.5 rounded text-[10px]">CM</span>
+                                </h2>
+                                <div class="flex flex-col gap-4">
+                                    <div class="group">
+                                        <label class="flex justify-between text-xs font-medium mb-1.5"><span
+                                                class="flex items-center gap-2"><span
+                                                    class="w-2 h-2 rounded-full bg-red-500"></span>
+                                                Critical</span></label>
+                                        <input id="cfgCrit"
+                                            class="w-full bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded-lg px-3 py-2 text-slate-900 dark:text-white font-mono text-sm focus:ring-1 focus:ring-red-500 focus:border-red-500 outline-none"
+                                            type="number" value="290" />
+                                    </div>
+                                    <div class="group">
+                                        <label class="flex justify-between text-xs font-medium mb-1.5"><span
+                                                class="flex items-center gap-2"><span
+                                                    class="w-2 h-2 rounded-full bg-orange-500"></span>
+                                                Danger</span></label>
+                                        <input id="cfgDang"
+                                            class="w-full bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded-lg px-3 py-2 text-slate-900 dark:text-white font-mono text-sm focus:ring-1 focus:ring-orange-500 focus:border-orange-500 outline-none"
+                                            type="number" value="260" />
+                                    </div>
+                                    <div class="group">
+                                        <label class="flex justify-between text-xs font-medium mb-1.5"><span
+                                                class="flex items-center gap-2"><span
+                                                    class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                                                Warning</span></label>
+                                        <input id="cfgWarn"
+                                            class="w-full bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded-lg px-3 py-2 text-slate-900 dark:text-white font-mono text-sm focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 outline-none"
+                                            type="number" value="220" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- NEW MANUAL ROI SECTION -->
+                        <div class="p-5 border-t border-slate-200 dark:border-slate-800">
+                            <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3">Manual ROI
+                                (Pixels)</h2>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label
+                                    class="flex justify-between items-center text-[10px] font-medium text-slate-500">Top
+                                    Y:
+                                    <input id="cfgRoiY1" type="number"
+                                        class="w-16 bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded px-2 py-1 text-slate-900 dark:text-white font-mono outline-none"
+                                        placeholder="auto">
+                                </label>
+                                <label
+                                    class="flex justify-between items-center text-[10px] font-medium text-slate-500">Bot
+                                    Y:
+                                    <input id="cfgRoiY2" type="number"
+                                        class="w-16 bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded px-2 py-1 text-slate-900 dark:text-white font-mono outline-none"
+                                        placeholder="auto">
+                                </label>
+                                <label
+                                    class="flex justify-between items-center text-[10px] font-medium text-slate-500">Left
+                                    X:
+                                    <input id="cfgRoiX1" type="number"
+                                        class="w-16 bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded px-2 py-1 text-slate-900 dark:text-white font-mono outline-none"
+                                        placeholder="auto">
+                                </label>
+                                <label
+                                    class="flex justify-between items-center text-[10px] font-medium text-slate-500">Right
+                                    X:
+                                    <input id="cfgRoiX2" type="number"
+                                        class="w-16 bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded px-2 py-1 text-slate-900 dark:text-white font-mono outline-none"
+                                        placeholder="auto">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-[#0b0e14] border-t border-slate-200 dark:border-slate-800">
+                            <button onclick="saveLevels()"
+                                class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold py-2.5 px-4 rounded-lg transition-all shadow shadow-primary/20 text-sm">
+                                <span class="material-icons text-[16px]">save</span> Save Calibration
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- TAB: ALERTS -->
+            <div id="tab-alerts" class="settings-tab-panel flex-1 overflow-y-auto hidden w-full h-full">
+                <div class="p-4 md:p-8 lg:p-10 max-w-4xl mx-auto">
+                    <header class="mb-8">
+                        <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">
+                            Notification Rules</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Determine which channels are used for
+                            each alert level.</p>
+                    </header>
+                    <div
+                        class="bg-white dark:bg-[#1a202c] border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+                        <div
+                            class="grid grid-cols-12 gap-2 p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#111318] text-xs uppercase font-bold text-slate-500 tracking-wider">
+                            <div class="col-span-6 md:col-span-8 pl-2">Trigger Event</div>
+                            <div class="col-span-6 md:col-span-4 text-center">SMS Delivery</div>
+                        </div>
+
+                        <div
+                            class="grid grid-cols-12 gap-2 p-4 border-b border-slate-200 dark:border-slate-800 items-center hover:bg-slate-50/50 dark:hover:bg-[#111318]/50 transition-colors">
+                            <div class="col-span-6 md:col-span-8 flex items-center gap-3 pl-2">
+                                <span class="material-icons text-yellow-500">warning</span>
+                                <div>
+                                    <p class="text-sm font-bold text-slate-900 dark:text-white">Warning Reached</p>
+                                    <p class="text-[10px] text-slate-500">Crosses yellow line</p>
+                                </div>
+                            </div>
+                            <div class="col-span-6 md:col-span-4 flex justify-center">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="notifyWarnSMS" class="sr-only peer" checked>
+                                    <div
+                                        class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary dark:bg-slate-700 dark:border-slate-600">
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div
+                            class="grid grid-cols-12 gap-2 p-4 border-b border-slate-200 dark:border-slate-800 items-center hover:bg-slate-50/50 dark:hover:bg-[#111318]/50 transition-colors">
+                            <div class="col-span-6 md:col-span-8 flex items-center gap-3 pl-2">
+                                <span class="material-icons text-orange-500">error</span>
+                                <div>
+                                    <p class="text-sm font-bold text-slate-900 dark:text-white">Danger Reached</p>
+                                    <p class="text-[10px] text-slate-500">Crosses orange line</p>
+                                </div>
+                            </div>
+                            <div class="col-span-6 md:col-span-4 flex justify-center">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="notifyDangSMS" class="sr-only peer" checked>
+                                    <div
+                                        class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary dark:bg-slate-700 dark:border-slate-600">
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div
+                            class="grid grid-cols-12 gap-2 p-4 items-center bg-red-50/50 dark:bg-red-900/10 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                            <div class="col-span-6 md:col-span-8 flex items-center gap-3 pl-2">
+                                <span class="material-icons text-red-500">notifications_active</span>
+                                <div>
+                                    <p class="text-sm font-bold text-red-600 dark:text-red-400">Critical Reached</p>
+                                    <p class="text-[10px] text-red-500/70">Crosses red line</p>
+                                </div>
+                            </div>
+                            <div class="col-span-6 md:col-span-4 flex justify-center">
+                                <label class="relative inline-flex items-center cursor-not-allowed opacity-60">
+                                    <input type="checkbox" class="sr-only peer" checked disabled>
+                                    <div
+                                        class="w-9 h-5 bg-red-500 rounded-full peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4">
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-slate-500 mt-3 pl-1 font-medium"><span class="text-red-500">*</span>
+                        Critical alerts are mandatory and forced to send SMS.</p>
+                    <div class="mt-6 flex justify-end">
+                        <button onclick="saveNotificationRules()"
+                            class="bg-primary hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-primary/20 flex items-center gap-2">
+                            <span class="material-icons text-[18px]">save</span> Save Rules
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: SMS RECIPIENTS -->
+            <div id="tab-sms" class="settings-tab-panel flex-1 overflow-y-auto hidden w-full h-full">
+                <div class="p-4 md:p-8 lg:p-10 max-w-4xl mx-auto flex flex-col gap-6">
+                    <header>
+                        <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">SMS
+                            Integration</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Manage who receives alerts via the KDE
+                            Connect bridge.</p>
+                    </header>
+
+                    <div
+                        class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#1a202c] p-6 shadow-sm">
+                        <div class="flex items-start md:items-center gap-4 mb-6">
+                            <div
+                                class="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 shrink-0">
+                                <span class="material-icons block">smartphone</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-900 dark:text-white">KDE Connect Device
+                                    Binding</h3>
+                                <p class="text-xs text-slate-500 mt-0.5">Device ID required for routing messages
+                                    from host to phone.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Device ID /
+                                Name</label>
+                            <div class="relative">
+                                <input id="cfgDeviceId"
+                                    class="w-full bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm rounded-lg focus:ring-1 focus:ring-primary focus:border-primary block p-2.5 font-mono"
+                                    type="text" placeholder="e.g. Y18">
+                            </div>
+                            <p class="text-[10px] text-slate-500 mt-1 flex items-center gap-1"><span
+                                    class="material-icons text-[12px]">lightbulb</span> Run <code
+                                    class="bg-slate-100 dark:bg-slate-800 px-1 rounded font-mono text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">kdeconnect-cli -l</code>
+                                on the host machine to list paired devices.</p>
+                        </div>
+                    </div>
+
+                    <div
+                        class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#1a202c] overflow-hidden shadow-sm flex flex-col">
+                        <div
+                            class="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#111318]/50 flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Active Recipients</h3>
+                            <span
+                                class="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Comma
+                                Separated</span>
+                        </div>
+                        <div class="p-6">
+                            <textarea id="cfgRecipients" rows="4"
+                                class="w-full bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 rounded-lg p-3 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-slate-400 font-mono shadow-inner"
+                                placeholder="+639123456789, +639987654321"></textarea>
+                            <p class="text-[10px] text-slate-500 mt-2">Enter phone numbers with country code
+                                separated by commas.</p>
+
+                            <div class="mt-6 flex justify-end">
+                                <button onclick="saveSmsSettings()"
+                                    class="bg-primary hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-primary/20 flex items-center gap-2">
+                                    <span class="material-icons text-[18px]">save</span> Save SMS Providers
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
+    </div>
     </div>
 
     <!-- Toast notifications -->
@@ -839,6 +1402,441 @@
                     showToast({ new_level: 'DANGER', message: 'Failed to save settings' });
                     console.error(e);
                 });
+        }
+
+
+        // ---- Settings Tab Switching ----
+        function switchTab(tabId) {
+            // Hide all panels
+            document.querySelectorAll('.settings-tab-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+            // Show targeted panel
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+            // Update sidebar buttons
+            document.querySelectorAll('[id^="tab-btn-"]').forEach(btn => {
+                btn.className = "flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left group";
+            });
+            const activeBtn = document.getElementById('tab-btn-' + tabId);
+            if (activeBtn) {
+                activeBtn.className = "flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary transition-colors text-left group border-l-2 border-primary";
+            }
+
+            // Update mobile select
+            const mobileSelect = document.getElementById('mobileTabSelect');
+            if (mobileSelect) mobileSelect.value = tabId;
+        }
+
+        function saveCameraSettings() {
+            // Need to save to API
+            const newURL = `http://${$('cfgDroidCamIp').value}:${$('cfgDroidCamPort').value}/video`;
+            fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ camera_url: newURL })
+            }).then(r => r.json()).then(() => {
+                showToast({ new_level: 'NORMAL', message: 'Camera settings saved. Restart required.' });
+            });
+        }
+
+        function saveLevels() {
+            // Save thresholds and ROI
+            const payload = {
+                thresholds: {
+                    critical: parseInt($('cfgCrit').value),
+                    danger: parseInt($('cfgDang').value),
+                    warning: parseInt($('cfgWarn').value)
+                }
+            };
+
+            // Use manual ROI inputs if valid, otherwise fallback to drawn ROI
+            let manualY1 = parseInt($('cfgRoiY1').value);
+            let manualY2 = parseInt($('cfgRoiY2').value);
+            let manualX1 = parseInt($('cfgRoiX1').value);
+            let manualX2 = parseInt($('cfgRoiX2').value);
+
+            if (!isNaN(manualY1) && !isNaN(manualY2) && !isNaN(manualX1) && !isNaN(manualX2)) {
+                payload.roi = [manualY1, manualY2, manualX1, manualX2];
+            } else if (drawnROI && drawnROI.x2 > 0) {
+                // Return array matching config format: [y1, y2, x1, x2]
+                payload.roi = [drawnROI.y1, drawnROI.y2, drawnROI.x1, drawnROI.x2];
+            }
+
+            fetch('/api/config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(r => r.json()).then(() => {
+                showToast({ new_level: 'NORMAL', message: 'Calibration and ROI applied successfully.' });
+            });
+        }
+
+        function saveNotificationRules() {
+            showToast({ new_level: 'NORMAL', message: 'Notification rules saved.' });
+        }
+
+        function saveSmsSettings() {
+            const payload = {
+                sms_device_id: $('cfgDeviceId').value,
+                sms_recipients: $('cfgRecipients').value
+            };
+            fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(r => r.json()).then(() => {
+                showToast({ new_level: 'NORMAL', message: 'SMS Configuration saved successfully' });
+            });
+        }
+
+        // OVERRIDE old saveSettings to avoid confusion
+        function saveSettings() {
+            console.log("Use specific save functions instead.");
+        }
+
+        // OVERRIDE old modal open to fetch all values
+        function openSettingsModal() {
+            const modal = $('settingsModal');
+            const content = $('settingsModalContent');
+            modal.classList.remove('hidden');
+
+            fetch('/api/settings').then(r => r.json()).then(data => {
+                $('cfgDeviceId').value = data.sms_device_id || '';
+                $('cfgRecipients').value = data.sms_recipients || '';
+            });
+
+            fetch('/api/config').then(r => r.json()).then(data => {
+                if (data.thresholds) {
+                    $('cfgCrit').value = data.thresholds.critical || 290;
+                    $('cfgDang').value = data.thresholds.danger || 260;
+                    $('cfgWarn').value = data.thresholds.warning || 220;
+                }
+                if (data.camera_url) {
+                    try {
+                        let url = new URL(data.camera_url);
+                        $('cfgDroidCamIp').value = url.hostname;
+                        $('cfgDroidCamPort').value = url.port || '4747';
+                        $('previewIp').innerText = url.hostname;
+                        $('previewPort').innerText = url.port || '4747';
+                    } catch (e) { }
+                }
+                if (data.roi) {
+                    // pre-load existing ROI: [y_min, y_max, x_min, x_max]
+                    drawnROI = {
+                        y1: data.roi[0],
+                        y2: data.roi[1],
+                        x1: data.roi[2],
+                        x2: data.roi[3]
+                    };
+                    $('cfgRoiY1').value = data.roi[0] !== null ? data.roi[0] : '';
+                    $('cfgRoiY2').value = data.roi[1] !== null ? data.roi[1] : '';
+                    $('cfgRoiX1').value = data.roi[2] !== null ? data.roi[2] : '';
+                    $('cfgRoiX2').value = data.roi[3] !== null ? data.roi[3] : '';
+                    drawCanvasRect();
+                }
+            });
+
+            // Input listeners for preview
+            $('cfgDroidCamIp').addEventListener('input', (e) => $('previewIp').innerText = e.target.value);
+            $('cfgDroidCamPort').addEventListener('input', (e) => $('previewPort').innerText = e.target.value);
+
+            // ROI manual listeners
+            ['cfgRoiY1', 'cfgRoiY2', 'cfgRoiX1', 'cfgRoiX2'].forEach(id => {
+                $(id).addEventListener('input', () => {
+                    drawnROI = {
+                        y1: parseInt($('cfgRoiY1').value) || 0,
+                        y2: parseInt($('cfgRoiY2').value) || 0,
+                        x1: parseInt($('cfgRoiX1').value) || 0,
+                        x2: parseInt($('cfgRoiX2').value) || 0,
+                    };
+                    drawCanvasRect();
+                });
+            });
+
+            setTimeout(() => {
+                modal.classList.replace('opacity-0', 'opacity-100');
+                content.classList.replace('scale-95', 'scale-100');
+                setupROICanvas(); // Ensure canvas matches img boundaries once rendered
+            }, 10);
+
+            // Fetch active model and update UI
+            fetch('/api/model').then(r => r.json()).then(data => {
+                updateModelUI(data.active_model || 'canny');
+            });
+
+            // Fetch YOLO config
+            fetch('/api/yolo_config').then(r => r.json()).then(data => {
+                if (data.line_start) {
+                    $('cfgYoloLineStartX').value = data.line_start[0];
+                    $('cfgYoloLineStartY').value = data.line_start[1];
+                }
+                if (data.line_end) {
+                    $('cfgYoloLineEndX').value = data.line_end[0];
+                    $('cfgYoloLineEndY').value = data.line_end[1];
+                }
+                if (data.pixels_per_meter) $('cfgYoloPxPerMeter').value = data.pixels_per_meter;
+                if (data.tip_height) $('cfgYoloTipHeight').value = data.tip_height;
+                if (data.confidence) $('cfgYoloConfidence').value = Math.round(data.confidence * 100);
+            }).catch(() => { });
+
+            switchTab('system'); // default tab
+        }
+
+        // ---- Model Selection ---
+        let _activeModel = 'canny';
+
+        function selectModel(model) {
+            if (model === _activeModel) return;
+            // Show loading toast
+            showToast({ new_level: 'WARNING', message: 'Switching model to ' + model.toUpperCase() + '...' });
+            fetch('/api/model', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: model })
+            }).then(r => r.json()).then(data => {
+                if (data.active_model) {
+                    updateModelUI(data.active_model);
+                    showToast({ new_level: 'NORMAL', message: 'Switched to ' + data.active_model.toUpperCase() + ' model.' });
+                }
+            }).catch(() => {
+                showToast({ new_level: 'DANGER', message: 'Failed to switch model.' });
+            });
+        }
+
+        function updateModelUI(model) {
+            _activeModel = model;
+            const cannyCard = $('modelCard-canny');
+            const yoloCard = $('modelCard-yolo');
+            const cannyDot = $('modelDot-canny');
+            const yoloDot = $('modelDot-yolo');
+            const yoloSettings = $('yoloSettings');
+            const cameraTabBtn = $('tab-btn-camera');
+
+            if (model === 'yolo') {
+                // YOLO active
+                yoloCard.className = 'cursor-pointer rounded-xl border-2 border-orange-500 bg-orange-500/5 p-5 flex gap-4 items-start transition-all hover:shadow-lg relative';
+                yoloDot.className = 'w-2.5 h-2.5 rounded-full bg-orange-500';
+                yoloDot.parentElement.className = 'absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-orange-500 flex items-center justify-center';
+                cannyCard.className = 'cursor-pointer rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-transparent p-5 flex gap-4 items-start transition-all hover:shadow-lg relative';
+                cannyDot.className = 'w-2.5 h-2.5 rounded-full bg-transparent';
+                cannyDot.parentElement.className = 'absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center';
+                // Show YOLO settings, hide Camera Calibration tab
+                if (yoloSettings) yoloSettings.classList.remove('hidden');
+                if (cameraTabBtn) cameraTabBtn.classList.add('hidden');
+                // Also hide camera tab panel if open
+                const cameraTab = $('tab-camera');
+                if (cameraTab && !cameraTab.classList.contains('hidden')) switchTab('system');
+            } else {
+                // Canny active
+                cannyCard.className = 'cursor-pointer rounded-xl border-2 border-primary bg-primary/5 p-5 flex gap-4 items-start transition-all hover:shadow-lg relative';
+                cannyDot.className = 'w-2.5 h-2.5 rounded-full bg-primary';
+                cannyDot.parentElement.className = 'absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center';
+                yoloCard.className = 'cursor-pointer rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-transparent p-5 flex gap-4 items-start transition-all hover:shadow-lg relative';
+                yoloDot.className = 'w-2.5 h-2.5 rounded-full bg-transparent';
+                yoloDot.parentElement.className = 'absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center';
+                // Hide YOLO settings, show Camera Calibration tab
+                if (yoloSettings) yoloSettings.classList.add('hidden');
+                if (cameraTabBtn) cameraTabBtn.classList.remove('hidden');
+            }
+
+            // Update mobile select options
+            const mobileSelect = $('mobileTabSelect');
+            if (mobileSelect) {
+                const cameraOpt = mobileSelect.querySelector('option[value="camera"]');
+                if (cameraOpt) cameraOpt.style.display = model === 'yolo' ? 'none' : '';
+            }
+        }
+
+        function saveYoloSettings() {
+            const payload = {
+                line_start: [parseInt($('cfgYoloLineStartX').value), parseInt($('cfgYoloLineStartY').value)],
+                line_end: [parseInt($('cfgYoloLineEndX').value), parseInt($('cfgYoloLineEndY').value)],
+                pixels_per_meter: parseFloat($('cfgYoloPxPerMeter').value),
+                tip_height: parseFloat($('cfgYoloTipHeight').value),
+                confidence: parseFloat($('cfgYoloConfidence').value) / 100.0
+            };
+            fetch('/api/yolo_config', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(r => r.json()).then(() => {
+                showToast({ new_level: 'NORMAL', message: 'YOLO configuration saved.' });
+            }).catch(() => {
+                showToast({ new_level: 'DANGER', message: 'Failed to save YOLO config.' });
+            });
+        }
+
+        // ==========================================
+        // ROI Canvas Logic
+        // ==========================================
+        const roiCanvas = $('roiCanvas');
+        const calibFeed = $('calibVideoFeed');
+        let roiCtx = null;
+        if (roiCanvas) roiCtx = roiCanvas.getContext('2d');
+
+        let isDrawing = false;
+        let startX, startY;
+        let currentX, currentY;
+
+        // Final mapped native resolution coordinates
+        // matching python detector config format: [y1, y2, x1, x2]
+        let drawnROI = null;
+
+        // Original video aspect tracking for object-contain mapping
+        let videoNaturalWidth = 1920;
+        let videoNaturalHeight = 1080;
+
+        function setupROICanvas() {
+            if (!roiCanvas || !calibFeed) return;
+            // Match canvas logical size to element size
+            roiCanvas.width = roiCanvas.clientWidth;
+            roiCanvas.height = roiCanvas.clientHeight;
+
+            // Try to extract actual stream resolution if possible
+            if (calibFeed.naturalWidth) {
+                videoNaturalWidth = calibFeed.naturalWidth;
+                videoNaturalHeight = calibFeed.naturalHeight;
+            }
+            drawCanvasRect(); // redraw if preloaded
+        }
+
+        window.addEventListener('resize', setupROICanvas);
+        if (calibFeed) calibFeed.onload = setupROICanvas;
+
+        if (roiCanvas) {
+            roiCanvas.addEventListener('mousedown', (e) => {
+                if (_activeModel === 'yolo') return; // Only used for Canny
+                const rect = roiCanvas.getBoundingClientRect();
+                startX = e.clientX - rect.left;
+                startY = e.clientY - rect.top;
+                isDrawing = true;
+            });
+
+            roiCanvas.addEventListener('mousemove', (e) => {
+                if (!isDrawing) return;
+                const rect = roiCanvas.getBoundingClientRect();
+                currentX = e.clientX - rect.left;
+                currentY = e.clientY - rect.top;
+
+                // Clear and draw active selection box
+                roiCtx.clearRect(0, 0, roiCanvas.width, roiCanvas.height);
+                drawCanvasRect(); // keep old/existing context
+
+                // Draw current drag box
+                roiCtx.strokeStyle = '#135bec'; // Primary blue
+                roiCtx.lineWidth = 2;
+                roiCtx.setLineDash([5, 5]);
+                roiCtx.strokeRect(startX, startY, currentX - startX, currentY - startY);
+                roiCtx.fillStyle = 'rgba(19, 91, 236, 0.2)';
+                roiCtx.fillRect(startX, startY, currentX - startX, currentY - startY);
+                roiCtx.setLineDash([]);
+            });
+
+            roiCanvas.addEventListener('mouseup', (e) => {
+                if (!isDrawing) return;
+                isDrawing = false;
+
+                // Calculate bounding box in CSS coordinates
+                const xMin = Math.min(startX, currentX);
+                const xMax = Math.max(startX, currentX);
+                const yMin = Math.min(startY, currentY);
+                const yMax = Math.max(startY, currentY);
+
+                // Ignore tiny clicks
+                if (xMax - xMin < 10 || yMax - yMin < 10) return;
+
+                // Map canvas CSS pixels -> Object Fit scaled image -> Native video pixels
+                // calculate object-contain dimensions
+                const canvasRatio = roiCanvas.width / roiCanvas.height;
+                const videoRatio = videoNaturalWidth / videoNaturalHeight;
+
+                let renderedWidth, renderedHeight, offsetX, offsetY;
+
+                if (canvasRatio > videoRatio) {
+                    // Pillarboxed (bars on sides)
+                    renderedHeight = roiCanvas.height;
+                    renderedWidth = renderedHeight * videoRatio;
+                    offsetX = (roiCanvas.width - renderedWidth) / 2;
+                    offsetY = 0;
+                } else {
+                    // Letterboxed (bars top/bottom)
+                    renderedWidth = roiCanvas.width;
+                    renderedHeight = renderedWidth / videoRatio;
+                    offsetX = 0;
+                    offsetY = (roiCanvas.height - renderedHeight) / 2;
+                }
+
+                // Map CSS coordinates relative to the rendered image bounds
+                const nativeXMin = Math.max(0, (xMin - offsetX) / renderedWidth) * videoNaturalWidth;
+                const nativeXMax = Math.min(1, (xMax - offsetX) / renderedWidth) * videoNaturalWidth;
+                const nativeYMin = Math.max(0, (yMin - offsetY) / renderedHeight) * videoNaturalHeight;
+                const nativeYMax = Math.min(1, (yMax - offsetY) / renderedHeight) * videoNaturalHeight;
+
+                drawnROI = {
+                    x1: Math.round(nativeXMin),
+                    x2: Math.round(nativeXMax),
+                    y1: Math.round(nativeYMin),
+                    y2: Math.round(nativeYMax)
+                };
+
+                // Sync textboxes 
+                if ($('cfgRoiY1')) {
+                    $('cfgRoiY1').value = drawnROI.y1;
+                    $('cfgRoiY2').value = drawnROI.y2;
+                    $('cfgRoiX1').value = drawnROI.x1;
+                    $('cfgRoiX2').value = drawnROI.x2;
+                }
+
+                const instr = $('roiInstruction');
+                if (instr) instr.innerHTML = `<span class="material-icons text-[14px] text-emerald-400">check_circle</span> ROI Selected: ${drawnROI.x1},${drawnROI.y1} to ${drawnROI.x2},${drawnROI.y2}`;
+
+                drawCanvasRect();
+            });
+        }
+
+        function drawCanvasRect() {
+            if (!roiCtx || !drawnROI) return;
+            roiCtx.clearRect(0, 0, roiCanvas.width, roiCanvas.height);
+
+            // Map native ROI back to CSS rendering coordinates for display
+            const canvasRatio = roiCanvas.width / roiCanvas.height;
+            const videoRatio = videoNaturalWidth / videoNaturalHeight;
+            let renderedWidth, renderedHeight, offsetX, offsetY;
+
+            if (canvasRatio > videoRatio) {
+                renderedHeight = roiCanvas.height;
+                renderedWidth = renderedHeight * videoRatio;
+                offsetX = (roiCanvas.width - renderedWidth) / 2;
+                offsetY = 0;
+            } else {
+                renderedWidth = roiCanvas.width;
+                renderedHeight = renderedWidth / videoRatio;
+                offsetX = 0;
+                offsetY = (roiCanvas.height - renderedHeight) / 2;
+            }
+
+            const cssX1 = (drawnROI.x1 / videoNaturalWidth) * renderedWidth + offsetX;
+            const cssX2 = (drawnROI.x2 / videoNaturalWidth) * renderedWidth + offsetX;
+            const cssY1 = (drawnROI.y1 / videoNaturalHeight) * renderedHeight + offsetY;
+            const cssY2 = (drawnROI.y2 / videoNaturalHeight) * renderedHeight + offsetY;
+
+            // Draw
+            roiCtx.strokeStyle = '#10b981'; // Emerald
+            roiCtx.lineWidth = 2;
+            roiCtx.strokeRect(cssX1, cssY1, cssX2 - cssX1, cssY2 - cssY1);
+
+            // Tint outside
+            roiCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            roiCtx.fillRect(0, 0, roiCanvas.width, cssY1); // top
+            roiCtx.fillRect(0, cssY1, cssX1, cssY2 - cssY1); // left
+            roiCtx.fillRect(cssX2, cssY1, roiCanvas.width - cssX2, cssY2 - cssY1); // right
+            roiCtx.fillRect(0, cssY2, roiCanvas.width, roiCanvas.height - cssY2); // bottom
+
+            // Label
+            roiCtx.fillStyle = '#10b981';
+            roiCtx.font = "12px monospace";
+            roiCtx.fillText("Active ROI", cssX1 + 4, cssY1 + 14);
         }
 
         // ---- Init ----

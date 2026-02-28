@@ -20,6 +20,7 @@ import yaml
 
 from camera import CameraStream
 from detector import WaterLevelDetector
+from yolo_detector import YoloWaterDetector
 from alerts import AlertManager
 from dashboard import Dashboard
 
@@ -36,8 +37,10 @@ class FloodWarningSystem:
     """Main flood early warning system orchestrator."""
 
     def __init__(self, config_path='config.yaml'):
+        import os
         # Load configuration
-        with open(config_path, 'r') as f:
+        abs_config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), config_path)
+        with open(abs_config_path, 'r') as f:
             self.config = yaml.safe_load(f)
 
         logger.info("=" * 60)
@@ -49,19 +52,63 @@ class FloodWarningSystem:
         logger.info("Initializing camera stream...")
         self.camera = CameraStream(self.config)
 
-        logger.info("Initializing water level detector...")
-        self.detector = WaterLevelDetector(self.config)
+        # Initialize both detectors but only load the active one
+        self.active_model = self.config['detection'].get('active_model', 'canny')
+        logger.info(f"Active detection model: {self.active_model}")
+
+        logger.info("Initializing Canny/Hough detector...")
+        self.canny_detector = WaterLevelDetector(self.config)
+
+        logger.info("Initializing YOLO detector (lazy)...")
+        self.yolo_detector = YoloWaterDetector(self.config)
+
+        # Set the active detector
+        if self.active_model == 'yolo':
+            self.yolo_detector.load()
+            self.detector = self.yolo_detector
+        else:
+            self.detector = self.canny_detector
 
         logger.info("Initializing alert manager...")
         self.alert_manager = AlertManager(self.config)
 
         logger.info("Initializing web dashboard...")
         self.dashboard = Dashboard(
-            self.config, self.camera, self.detector, self.alert_manager
+            self.config, self.camera, self.detector, self.alert_manager,
+            system=self
         )
 
         self._running = False
         self._detection_thread = None
+
+    def switch_model(self, model_name):
+        """Hot-swap the active detection model."""
+        if model_name == self.active_model:
+            return self.active_model
+
+        logger.info(f"Switching detection model: {self.active_model} → {model_name}")
+
+        if model_name == 'yolo':
+            self.yolo_detector.load()
+            self.detector = self.yolo_detector
+        else:
+            self.yolo_detector.unload()
+            self.detector = self.canny_detector
+
+        self.active_model = model_name
+        self.config['detection']['active_model'] = model_name
+        self.dashboard.detector = self.detector
+
+        # Persist to config
+        try:
+            import yaml
+            with open('config.yaml', 'w') as f:
+                yaml.dump(self.config, f, default_flow_style=False)
+        except Exception as e:
+            logger.error(f"Failed to save config: {e}")
+
+        logger.info(f"Now using: {model_name}")
+        return model_name
 
     def start(self):
         """Start all system components."""
