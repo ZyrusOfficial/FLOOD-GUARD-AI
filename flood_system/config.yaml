@@ -1,0 +1,83 @@
+# ============================================
+# Flood Early Warning System — Configuration
+# ============================================
+
+camera:
+  # DroidCam IP (change this to the IP shown in your DroidCam app)
+  droidcam_ip: "192.168.1.175"
+  droidcam_port: 4747
+  # DroidCam MJPEG stream URL (usually http://<ip>:4747/video)
+  stream_url: "http://192.168.1.175:4747/video"
+  # Fallback to local webcam if DroidCam unavailable
+  fallback_webcam: 0
+  # Max FPS to process (reduces CPU load)
+  max_fps: 15
+  # Reconnect delay in seconds
+  reconnect_delay: 3
+
+detection:
+  # Region of Interest [y_start, y_end, x_start, x_end]
+  roi: [0, 1800, 500, 750]
+  # Canny edge detection thresholds
+  canny_low: 50
+  canny_high: 90
+  # HoughLinesP parameters
+  hough_rho: 1
+  hough_threshold: 15
+  hough_min_line_length: 50
+  hough_max_line_gap: 20
+  # Water level offset (px) — adjusts for detection bias
+  water_level_offset: 150
+  # Calibration values (from calibrate.py)
+  calibration:
+    top_px: 400
+    top_cm: 300
+    bottom_px: 1310
+    bottom_cm: 170
+  # Moving average window size for smoothing
+  smoothing_window: 5
+
+alerts:
+  # Water level thresholds (in cm)
+  thresholds:
+    warning: 220
+    danger: 260
+    critical: 290
+  # Hysteresis — level must drop this many cm below threshold to clear alert
+  hysteresis: 5
+  # Cooldown between repeated alerts (seconds) per channel
+  cooldown:
+    sms: 300        # 5 minutes
+    nostr: 120      # 2 minutes
+    ble: 30         # 30 seconds
+    dashboard: 10   # 10 seconds
+
+sms:
+  # To get device ID, run: kdeconnect-cli --list-devices
+  device_id: "Y18"
+  # List of phone numbers to receive SMS alerts
+  recipients:
+    - "+639123456789" # Replace with actual number
+nostr:
+  # Nostr relay URLs for Bitchat
+  relays:
+    - "wss://relay.damus.io"
+    - "wss://relay.nostr.band"
+    - "wss://nos.lol"
+  # Private key (hex) — generate one or leave empty to auto-generate
+  private_key: ""
+
+esp32:
+  # Serial port for ESP32
+  port: "/dev/ttyUSB0"
+  baud_rate: 115200
+  # Enable/disable ESP32 BLE beacon
+  enabled: true
+
+dashboard:
+  host: "0.0.0.0"
+  port: 5000
+  # Number of data points to keep in history
+  history_length: 500
+  # Update interval in milliseconds
+  update_interval: 1000

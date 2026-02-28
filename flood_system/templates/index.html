@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>HYDROGUARD — Flood Early Warning System</title>
+    <meta name="description" content="AI-powered real-time flood monitoring with triple-redundant alerts">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                        "panel-dark": "#161f2e",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #101622;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2d3748;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4a5568;
+        }
+
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        @keyframes pulseGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 5px rgba(239, 68, 68, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+            }
+        }
+
+        .alert-glow {
+            animation: pulseGlow 1.5s infinite;
+        }
+
+        .water-fill {
+            transition: height 1s ease-out;
+        }
+
+        .water-level-line {
+            transition: top 1s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast-animate {
+            animation: slideInRight 0.3s ease;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- Header -->
+    <header
+        class="h-14 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-panel-dark flex items-center justify-between px-4 sticky top-0 z-30 shadow-md">
+        <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded bg-primary flex items-center justify-center shrink-0">
+                <span class="material-icons text-white text-sm">water_drop</span>
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-sm font-bold tracking-wide leading-none">HYDRO<span class="text-primary">GUARD</span>
+                </h1>
+                <span class="text-[10px] text-slate-400 font-normal">By Prince Zyrus Natividad</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="flex flex-col items-end">
+                <div class="flex items-center gap-1.5">
+                    <span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="statusText"
+                        class="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400">Connecting</span>
+                </div>
+                <span id="clockDisplay" class="text-[10px] text-slate-400 font-mono">--:--:-- UTC</span>
+            </div>
+            <button onclick="document.documentElement.classList.toggle('dark')"
+                class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                <span class="material-icons text-slate-500 text-sm">dark_mode</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 grid grid-cols-1 lg:grid-cols-3 gap-4 pb-32 lg:pb-4">
+        <!-- Left Column: Camera + History -->
+        <div class="lg:col-span-2 flex flex-col gap-4">
+            <!-- Camera Feed -->
+            <div
+                class="bg-white dark:bg-panel-dark rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-lg flex flex-col h-full">
+                <div
+                    class="p-3 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
+                    <div class="flex items-center gap-2">
+                        <span id="liveDot"
+                            class="material-icons text-red-500 text-[10px] animate-pulse">fiber_manual_record</span>
+                        <span
+                            class="text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-200">Cam
+                            01</span>
+                        <span id="cameraSourceBadge"
+                            class="text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded font-medium hidden">DroidCam</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] text-slate-500 font-mono">
+                        <span id="resolutionDisplay" class="hidden sm:inline">--</span>
+                        <span>FPS:<span id="fpsDisplay" class="text-emerald-500 ml-0.5">--</span></span>
+                    </div>
+                </div>
+                <div class="relative aspect-video bg-black w-full flex-grow">
+                    <!-- Live video feed from Flask -->
+                    <img id="videoFeed" alt="River camera feed" class="w-full h-full object-contain opacity-90"
+                        src="/video_feed">
+
+                    <!-- Overlay waiting message -->
+                    <div id="videoOverlay" class="absolute inset-0 bg-black/70 flex items-center justify-center">
+                        <div class="text-center">
+                            <span
+                                class="material-icons text-slate-500 text-4xl mb-2 block animate-pulse">videocam_off</span>
+                            <p class="text-slate-400 text-sm">Waiting for camera...</p>
+                            <p class="text-slate-500 text-[10px] mt-1">Start DroidCam on your phone</p>
+                        </div>
+                    </div>
+
+                    <!-- Detection overlay -->
+                    <div class="absolute inset-0 pointer-events-none p-3 flex flex-col justify-between">
+                        <div class="flex justify-between items-start">
+                            <div id="confBadge"
+                                class="bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded border border-white/10 text-white/80 text-[10px] font-mono">
+                                CONF: --%
+                            </div>
+                            <div
+                                class="bg-red-500/90 text-white px-1.5 py-0.5 rounded text-[10px] font-bold animate-pulse">
+                                LIVE
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grid overlay -->
+                    <div
+                        class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none">
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Chart (Desktop) -->
+            <div
+                class="bg-white dark:bg-panel-dark rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm hidden lg:block">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide">History
+                    </h3>
+                    <div class="flex bg-slate-100 dark:bg-slate-900 rounded p-0.5">
+                        <button onclick="setChartRange(60)"
+                            class="chart-range-btn px-2 py-1 text-[10px] rounded text-slate-500 hover:text-primary dark:hover:text-white transition">1H</button>
+                        <button onclick="setChartRange(360)"
+                            class="chart-range-btn px-2 py-1 text-[10px] rounded bg-white dark:bg-primary text-primary dark:text-white shadow-sm font-medium active-range">6H</button>
+                        <button onclick="setChartRange(1440)"
+                            class="chart-range-btn px-2 py-1 text-[10px] rounded text-slate-500 hover:text-primary dark:hover:text-white transition">24H</button>
+                    </div>
+                </div>
+                <div class="relative w-full h-48 border-l border-b border-slate-200 dark:border-slate-700">
+                    <!-- Threshold lines -->
+                    <div id="critLine"
+                        class="absolute w-full border-t border-dashed border-red-500/50 flex items-center"
+                        style="top: 20%">
+                        <span class="text-[8px] text-red-500 ml-[-28px] absolute font-mono" id="critLabel">290</span>
+                    </div>
+                    <div id="warnLine"
+                        class="absolute w-full border-t border-dashed border-yellow-500/50 flex items-center"
+                        style="top: 55%">
+                        <span class="text-[8px] text-yellow-500 ml-[-28px] absolute font-mono" id="warnLabel">220</span>
+                    </div>
+                    <!-- SVG Chart -->
+                    <svg id="historyChart" class="absolute inset-0 w-full h-full overflow-visible"
+                        preserveAspectRatio="none" viewBox="0 0 1200 100">
+                        <defs>
+                            <linearGradient id="gradientArea" x1="0" x2="0" y1="0" y2="1">
+                                <stop offset="0%" stop-color="#135bec" stop-opacity="0.2"></stop>
+                                <stop offset="100%" stop-color="#135bec" stop-opacity="0"></stop>
+                            </linearGradient>
+                        </defs>
+                        <path id="chartAreaPath" d="" fill="url(#gradientArea)" stroke="none"></path>
+                        <path id="chartLinePath" d="" fill="none" stroke="#135bec" stroke-width="2"></path>
+                        <circle id="chartDot" class="animate-pulse" cx="0" cy="0" fill="#135bec" r="4" stroke="white"
+                            stroke-width="2" style="display:none"></circle>
+                    </svg>
+                    <!-- Time labels -->
+                    <div
+                        class="absolute -bottom-5 w-full flex justify-between text-[8px] text-slate-400 font-mono px-1">
+                        <span id="timeLabel1">--:--</span>
+                        <span id="timeLabel2">--:--</span>
+                        <span id="timeLabel3">--:--</span>
+                        <span>Now</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="flex flex-col gap-4 lg:col-span-1">
+            <!-- Water Level + Gauge cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-1 gap-4">
+                <!-- Water Level Card -->
+                <div
+                    class="bg-white dark:bg-panel-dark rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm flex flex-col justify-center items-center relative overflow-hidden aspect-square">
+                    <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none">
+                    </div>
+                    <h2 class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Water Level</h2>
+                    <div class="flex items-baseline gap-0.5">
+                        <span id="waterLevelValue"
+                            class="text-5xl lg:text-6xl font-display font-bold text-slate-900 dark:text-white tracking-tighter">--</span>
+                        <span class="text-sm font-medium text-slate-500">CM</span>
+                    </div>
+                    <div id="trendBadge"
+                        class="mt-3 flex items-center gap-1 text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full border border-emerald-500/20">
+                        <span class="material-icons text-[10px]">check_circle</span>
+                        <span class="text-[10px] font-bold">NORMAL</span>
+                    </div>
+                </div>
+
+                <!-- Vertical Gauge Card -->
+                <div
+                    class="bg-white dark:bg-panel-dark rounded-xl border border-slate-200 dark:border-slate-800 p-3 shadow-sm flex items-center justify-center aspect-square">
+                    <div class="w-full h-full flex gap-2">
+                        <div
+                            class="flex flex-col justify-between text-[10px] text-slate-400 font-mono text-right py-1 w-6">
+                            <span>350</span><span>300</span><span>250</span><span>200</span><span>150</span><span>100</span><span>0</span>
+                        </div>
+                        <div
+                            class="flex-1 bg-slate-100 dark:bg-slate-800 rounded-lg relative overflow-hidden border border-slate-200 dark:border-slate-700 shadow-inner w-8 mx-auto">
+                            <div id="gaugeBarFill"
+                                class="water-fill absolute bottom-0 w-full bg-gradient-to-t from-primary via-blue-400 to-yellow-400 transition-all duration-1000 ease-out"
+                                style="height: 0%"></div>
+                            <div class="absolute inset-0 flex flex-col justify-between py-1 px-1">
+                                <div class="w-full border-b border-slate-900/10 dark:border-white/10 h-0"></div>
+                                <div class="w-full border-b border-red-500/50 h-0 border-dashed relative">
+                                    <span class="absolute right-0 top-[-8px] text-[8px] text-red-500">CRIT</span>
+                                </div>
+                                <div class="w-full border-b border-yellow-500/50 h-0 border-dashed relative">
+                                    <span class="absolute right-0 top-[-8px] text-[8px] text-yellow-500">WARN</span>
+                                </div>
+                                <div class="w-full border-b border-slate-900/10 dark:border-white/10 h-0"></div>
+                                <div class="w-full border-b border-slate-900/10 dark:border-white/10 h-0"></div>
+                                <div class="w-full border-b border-slate-900/10 dark:border-white/10 h-0"></div>
+                                <div class="w-full border-b border-slate-900/10 dark:border-white/10 h-0"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Chart (Mobile) -->
+            <div
+                class="bg-white dark:bg-panel-dark rounded-xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm lg:hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide">History
+                    </h3>
+                    <div class="flex bg-slate-100 dark:bg-slate-900 rounded p-0.5">
+                        <button onclick="setChartRange(60)"
+                            class="chart-range-btn-m px-2 py-1 text-[10px] rounded text-slate-500 hover:text-primary dark:hover:text-white transition">1H</button>
+                        <button onclick="setChartRange(360)"
+                            class="chart-range-btn-m px-2 py-1 text-[10px] rounded bg-white dark:bg-primary text-primary dark:text-white shadow-sm font-medium active-range">6H</button>
+                        <button onclick="setChartRange(1440)"
+                            class="chart-range-btn-m px-2 py-1 text-[10px] rounded text-slate-500 hover:text-primary dark:hover:text-white transition">24H</button>
+                    </div>
+                </div>
+                <div class="relative w-full aspect-video border-l border-b border-slate-200 dark:border-slate-700">
+                    <div class="absolute w-full border-t border-dashed border-red-500/50 top-[20%] flex items-center">
+                        <span class="text-[8px] text-red-500 ml-[-25px] absolute font-mono">290</span>
+                    </div>
+                    <div
+                        class="absolute w-full border-t border-dashed border-yellow-500/50 top-[55%] flex items-center">
+                        <span class="text-[8px] text-yellow-500 ml-[-25px] absolute font-mono">220</span>
+                    </div>
+                    <svg id="historyChartMobile" class="absolute inset-0 w-full h-full overflow-visible"
+                        preserveAspectRatio="none" viewBox="0 0 1200 100">
+                        <defs>
+                            <linearGradient id="gradientAreaMobile" x1="0" x2="0" y1="0" y2="1">
+                                <stop offset="0%" stop-color="#135bec" stop-opacity="0.2"></stop>
+                                <stop offset="100%" stop-color="#135bec" stop-opacity="0"></stop>
+                            </linearGradient>
+                        </defs>
+                        <path id="chartAreaPathM" d="" fill="url(#gradientAreaMobile)" stroke="none"></path>
+                        <path id="chartLinePathM" d="" fill="none" stroke="#135bec" stroke-width="3"></path>
+                        <circle id="chartDotM" class="animate-pulse" cx="0" cy="0" fill="#135bec" r="6" stroke="white"
+                            stroke-width="2" style="display:none"></circle>
+                    </svg>
+                    <div
+                        class="absolute -bottom-5 w-full flex justify-between text-[8px] text-slate-400 font-mono px-1">
+                        <span id="timeLabelM1">--:--</span>
+                        <span id="timeLabelM2">--:--</span>
+                        <span id="timeLabelM3">--:--</span>
+                        <span>Now</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alert Panel -->
+            <div id="alertPanel"
+                class="bg-white dark:bg-panel-dark rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col overflow-hidden max-h-64 h-full">
+                <div id="alertHeader"
+                    class="p-3 border-b border-slate-200 dark:border-slate-800 bg-emerald-500/10 flex justify-between items-center sticky top-0 backdrop-blur-sm z-10">
+                    <div>
+                        <h3 id="alertTitle" class="text-xs font-bold text-emerald-600 dark:text-emerald-400">STATUS:
+                            NORMAL</h3>
+                    </div>
+                    <div id="alertBell" class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center">
+                        <span class="material-icons text-white text-[10px]">check_circle</span>
+                    </div>
+                </div>
+                <div id="alertLog" class="flex-1 overflow-y-auto p-3 space-y-2">
+                    <div
+                        class="flex gap-3 items-start p-2 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 opacity-60">
+                        <div class="mt-0.5 text-emerald-500">
+                            <span class="material-icons text-sm">check_circle</span>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-700 dark:text-slate-300">System started</p>
+                            <p class="text-[10px] text-slate-500">Monitoring active</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-2 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/30">
+                    <button onclick="clearAlerts()"
+                        class="w-full py-1 text-[10px] font-medium text-slate-500 hover:text-primary dark:hover:text-white transition-colors text-center">
+                        Clear History</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer / Controls -->
+    <footer
+        class="fixed lg:static bottom-0 w-full bg-white dark:bg-panel-dark border-t border-slate-200 dark:border-slate-800 px-4 py-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-none z-40 pb-safe lg:pb-3">
+        <div class="flex flex-col gap-3 lg:flex-row lg:justify-between lg:items-center">
+            <div
+                class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700/50 lg:border-none pb-2 lg:pb-0 lg:gap-6">
+                <div class="flex gap-4">
+                    <div id="chWeb" class="flex items-center gap-1 text-emerald-500">
+                        <span class="material-icons text-[14px]">wifi</span>
+                        <span class="text-[10px] font-bold">WEB</span>
+                    </div>
+                    <div id="chSms" class="flex items-center gap-1 text-slate-300 dark:text-slate-600">
+                        <span class="material-icons text-[14px]">sms</span>
+                        <span class="text-[10px]">SMS</span>
+                    </div>
+                    <div id="chBle" class="flex items-center gap-1 text-slate-300 dark:text-slate-600">
+                        <span class="material-icons text-[14px]">bluetooth</span>
+                        <span class="text-[10px]">BLE</span>
+                    </div>
+                    <div id="chChat" class="flex items-center gap-1 text-slate-300 dark:text-slate-600">
+                        <span class="material-icons text-[14px]">chat</span>
+                        <span class="text-[10px]">CHAT</span>
+                    </div>
+                </div>
+                <div id="uptimeDisplay" class="text-[10px] text-slate-400 font-mono">
+                    UP: --
+                </div>
+            </div>
+            <div class="grid grid-cols-4 gap-2 lg:flex lg:w-auto">
+                <button onclick="openSettingsModal()"
+                    class="flex flex-col lg:flex-row lg:gap-2 items-center justify-center p-2 lg:px-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 active:scale-95 transition-transform hover:bg-slate-100 dark:hover:bg-slate-700">
+                    <span class="material-icons text-slate-500 text-lg mb-1 lg:mb-0">settings</span>
+                    <span class="text-[10px] font-medium text-slate-600 dark:text-slate-300">Settings</span>
+                </button>
+                <button onclick="window.open('/api/config','_blank')"
+                    class="flex flex-col lg:flex-row lg:gap-2 items-center justify-center p-2 lg:px-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 active:scale-95 transition-transform hover:bg-slate-100 dark:hover:bg-slate-700">
+                    <span class="material-icons text-slate-500 text-lg mb-1 lg:mb-0">build</span>
+                    <span class="text-[10px] font-medium text-slate-600 dark:text-slate-300">Calibrate</span>
+                </button>
+                <button onclick="testAlert()"
+                    class="flex flex-col lg:flex-row lg:gap-2 items-center justify-center p-2 lg:px-4 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 active:scale-95 transition-transform hover:bg-slate-100 dark:hover:bg-slate-700">
+                    <span class="material-icons text-slate-500 text-lg mb-1 lg:mb-0">science</span>
+                    <span class="text-[10px] font-medium text-slate-600 dark:text-slate-300">Test Alert</span>
+                </button>
+                <button onclick="stopSystem()"
+                    class="flex flex-col lg:flex-row lg:gap-2 items-center justify-center p-2 lg:px-4 rounded-lg bg-red-500 text-white shadow-md active:scale-95 transition-transform hover:bg-red-600">
+                    <span class="material-icons text-lg mb-1 lg:mb-0">stop_circle</span>
+                    <span class="text-[10px] font-bold">STOP SYS</span>
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal"
+        class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-panel-dark border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl w-[90%] max-w-md overflow-hidden transform scale-95 transition-transform duration-300"
+            id="settingsModalContent">
+            <div
+                class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">
+                <h3 class="font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <span class="material-icons text-primary text-sm">settings</span> System Settings
+                </h3>
+                <button onclick="closeSettingsModal()"
+                    class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">KDE Connect Device
+                        ID</label>
+                    <input type="text" id="cfgDeviceId"
+                        class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded p-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-slate-400"
+                        placeholder="e.g. Y18">
+                    <p class="text-[10px] text-slate-500 mt-1">Run <code
+                            class="bg-slate-100 dark:bg-slate-800 px-1 rounded">kdeconnect-cli -l</code> on host PC to
+                        find this.</p>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1">SMS Recipients (Comma
+                        separated)</label>
+                    <textarea id="cfgRecipients" rows="3"
+                        class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded p-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary placeholder-slate-400 font-mono"
+                        placeholder="+639123456789, +1234567890"></textarea>
+                </div>
+            </div>
+            <div
+                class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex justify-end gap-3">
+                <button onclick="closeSettingsModal()"
+                    class="px-4 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition-colors">Cancel</button>
+                <button onclick="saveSettings()"
+                    class="px-4 py-1.5 text-xs font-bold text-white bg-primary hover:bg-blue-600 rounded shadow-sm transition-colors flex items-center gap-1">
+                    <span class="material-icons text-[14px]">save</span> Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toastContainer" class="fixed top-16 right-4 z-50 flex flex-col gap-2"></div>
+
+    <script>
+        // ======== HYDROGUARD Dashboard — Live data wiring ========
+
+        const socket = io();
+
+        // ---- State ----
+        let chartData = [];
+        let currentLevel = 0;
+        let chartRange = 360; // minutes
+        const ALERT_COLORS = {
+            0: { name: 'NORMAL', color: 'emerald', icon: 'check_circle' },
+            1: { name: 'WARNING', color: 'yellow', icon: 'warning' },
+            2: { name: 'DANGER', color: 'orange', icon: 'error' },
+            3: { name: 'CRITICAL', color: 'red', icon: 'notifications_active' },
+        };
+
+        // ---- Elements ----
+        const $ = id => document.getElementById(id);
+
+        // ---- Clock ----
+        setInterval(() => {
+            const now = new Date();
+            $('clockDisplay').textContent = now.toLocaleTimeString('en-US', { hour12: false }) + ' UTC';
+        }, 1000);
+
+        // ---- Socket.IO Events ----
+        socket.on('connect', () => {
+            $('statusText').textContent = 'Online';
+            $('statusDot').className = 'w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse';
+        });
+
+        socket.on('disconnect', () => {
+            $('statusText').textContent = 'Offline';
+            $('statusDot').className = 'w-1.5 h-1.5 rounded-full bg-red-500';
+        });
+
+        socket.on('water_level', (data) => {
+            updateWaterLevel(data);
+        });
+
+        socket.on('alert', (data) => {
+            addAlertEntry(data);
+            showToast(data);
+        });
+
+        // ---- Update Water Level ----
+        function updateWaterLevel(data) {
+            const cm = data.water_level_cm;
+            const conf = data.confidence || 0;
+            const level = data.alert_level || 0;
+
+            if (cm !== null && cm !== undefined) {
+                // Big number
+                $('waterLevelValue').textContent = Math.round(cm);
+
+                // Gauge fill (0-350 range)
+                const pct = Math.max(0, Math.min(100, (cm / 350) * 100));
+                $('gaugeBarFill').style.height = pct + '%';
+
+                // Change gauge gradient color based on level
+                if (level >= 3) {
+                    $('gaugeBarFill').className = 'water-fill absolute bottom-0 w-full bg-gradient-to-t from-red-600 via-red-400 to-red-300 transition-all duration-1000 ease-out';
+                } else if (level >= 2) {
+                    $('gaugeBarFill').className = 'water-fill absolute bottom-0 w-full bg-gradient-to-t from-orange-600 via-orange-400 to-yellow-400 transition-all duration-1000 ease-out';
+                } else if (level >= 1) {
+                    $('gaugeBarFill').className = 'water-fill absolute bottom-0 w-full bg-gradient-to-t from-primary via-blue-400 to-yellow-400 transition-all duration-1000 ease-out';
+                } else {
+                    $('gaugeBarFill').className = 'water-fill absolute bottom-0 w-full bg-gradient-to-t from-primary via-blue-400 to-emerald-400 transition-all duration-1000 ease-out';
+                }
+
+                // Confidence
+                $('confBadge').textContent = 'CONF: ' + Math.round(conf * 100) + '%';
+
+                // Trend badge
+                updateTrendBadge(level);
+
+                // Add to chart
+                chartData.push({ ts: data.timestamp, cm: cm });
+                if (chartData.length > 1000) chartData = chartData.slice(-1000);
+                renderChart();
+            }
+
+            // Update alert level
+            if (level !== currentLevel) {
+                currentLevel = level;
+                updateAlertPanel(level);
+            }
+        }
+
+        function updateTrendBadge(level) {
+            const badge = $('trendBadge');
+            const info = ALERT_COLORS[level];
+            const colorMap = {
+                'emerald': { text: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+                'yellow': { text: 'text-yellow-500', bg: 'bg-yellow-500/10', border: 'border-yellow-500/20' },
+                'orange': { text: 'text-orange-500', bg: 'bg-orange-500/10', border: 'border-orange-500/20' },
+                'red': { text: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/20' },
+            };
+            const c = colorMap[info.color];
+            badge.className = `mt-3 flex items-center gap-1 ${c.text} ${c.bg} px-2 py-1 rounded-full border ${c.border}`;
+            badge.innerHTML = `<span class="material-icons text-[10px]">${info.icon}</span><span class="text-[10px] font-bold">${info.name}</span>`;
+        }
+
+        function updateAlertPanel(level) {
+            const info = ALERT_COLORS[level];
+            const header = $('alertHeader');
+            const title = $('alertTitle');
+            const bell = $('alertBell');
+
+            const colorCls = {
+                'emerald': { headerBg: 'bg-emerald-500/10', titleText: 'text-emerald-600 dark:text-emerald-400', bellBg: 'bg-emerald-500' },
+                'yellow': { headerBg: 'bg-yellow-500/10', titleText: 'text-yellow-600 dark:text-yellow-400', bellBg: 'bg-yellow-500' },
+                'orange': { headerBg: 'bg-orange-500/10', titleText: 'text-orange-600 dark:text-orange-400', bellBg: 'bg-orange-500' },
+                'red': { headerBg: 'bg-red-500/10', titleText: 'text-red-600 dark:text-red-400', bellBg: 'bg-red-500' },
+            };
+            const c = colorCls[info.color];
+
+            header.className = `p-3 border-b border-slate-200 dark:border-slate-800 ${c.headerBg} flex justify-between items-center sticky top-0 backdrop-blur-sm z-10`;
+            title.className = `text-xs font-bold ${c.titleText}`;
+            title.textContent = `ALERT: ${info.name}`;
+            bell.className = `w-6 h-6 rounded-full ${c.bellBg} flex items-center justify-center` + (level >= 2 ? ' animate-pulse' : '');
+            bell.innerHTML = `<span class="material-icons text-white text-[10px]">${info.icon}</span>`;
+        }
+
+        // ---- Alert Log ----
+        function addAlertEntry(data) {
+            const log = $('alertLog');
+            const time = new Date(data.timestamp * 1000);
+            const timeStr = time.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const levelName = (data.new_level || 'INFO').toLowerCase();
+
+            const iconMap = {
+                'warning': { icon: 'warning', color: 'text-yellow-500' },
+                'danger': { icon: 'error', color: 'text-orange-500' },
+                'critical': { icon: 'notifications_active', color: 'text-red-500' },
+                'normal': { icon: 'check_circle', color: 'text-emerald-500' },
+            };
+            const ic = iconMap[levelName] || iconMap['normal'];
+
+            const entry = document.createElement('div');
+            entry.className = 'flex gap-3 items-start p-2 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800';
+            entry.innerHTML = `
+            <div class="mt-0.5 ${ic.color}"><span class="material-icons text-sm">${ic.icon}</span></div>
+            <div>
+                <p class="text-xs font-bold text-slate-700 dark:text-slate-300">${data.message || data.new_level || 'Alert'}</p>
+                <p class="text-[10px] text-slate-500">${timeStr} • Water at ${data.water_level_cm || '--'} cm</p>
+            </div>
+        `;
+
+            log.insertBefore(entry, log.firstChild);
+            while (log.children.length > 20) log.removeChild(log.lastChild);
+        }
+
+        function clearAlerts() {
+            $('alertLog').innerHTML = '';
+        }
+
+        // ---- SVG Chart ----
+        function renderChart() {
+            const now = Date.now() / 1000;
+            const rangeSeconds = chartRange * 60;
+            const filtered = chartData.filter(p => (now - p.ts) <= rangeSeconds);
+
+            if (filtered.length < 2) return;
+
+            const minCm = 0, maxCm = 350;
+            const w = 1200, h = 100;
+
+            let linePts = [];
+            let areaPts = [];
+
+            filtered.forEach((p, i) => {
+                const x = ((p.ts - filtered[0].ts) / (filtered[filtered.length - 1].ts - filtered[0].ts)) * w;
+                const y = h - ((p.cm - minCm) / (maxCm - minCm)) * h;
+                linePts.push(`${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`);
+                areaPts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+            });
+
+            const lineD = linePts.join(' ');
+            const areaD = `M${areaPts[0]} ${linePts.slice(1).join(' ')} L${w},${h} L0,${h} Z`;
+
+            // Desktop chart
+            $('chartLinePath').setAttribute('d', lineD);
+            $('chartAreaPath').setAttribute('d', areaD);
+            const lastPt = filtered[filtered.length - 1];
+            const lastX = w;
+            const lastY = h - ((lastPt.cm - minCm) / (maxCm - minCm)) * h;
+            $('chartDot').setAttribute('cx', lastX);
+            $('chartDot').setAttribute('cy', lastY);
+            $('chartDot').style.display = '';
+
+            // Mobile chart (duplicate)
+            const mLine = document.getElementById('chartLinePathM');
+            const mArea = document.getElementById('chartAreaPathM');
+            const mDot = document.getElementById('chartDotM');
+            if (mLine) { mLine.setAttribute('d', lineD); }
+            if (mArea) { mArea.setAttribute('d', areaD); }
+            if (mDot) { mDot.setAttribute('cx', lastX); mDot.setAttribute('cy', lastY); mDot.style.display = ''; }
+
+            // Time labels
+            const first = new Date(filtered[0].ts * 1000);
+            const mid = new Date(((filtered[0].ts + lastPt.ts) / 2) * 1000);
+            const late = new Date(((filtered[0].ts * 0.25 + lastPt.ts * 0.75)) * 1000);
+            const fmt = d => d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            $('timeLabel1').textContent = fmt(first);
+            $('timeLabel2').textContent = fmt(mid);
+            $('timeLabel3').textContent = fmt(late);
+            if ($('timeLabelM1')) { $('timeLabelM1').textContent = fmt(first); }
+            if ($('timeLabelM2')) { $('timeLabelM2').textContent = fmt(mid); }
+            if ($('timeLabelM3')) { $('timeLabelM3').textContent = fmt(late); }
+        }
+
+        function setChartRange(minutes) {
+            chartRange = minutes;
+            // Update button states
+            document.querySelectorAll('.chart-range-btn, .chart-range-btn-m').forEach(btn => {
+                btn.className = btn.className.replace(/bg-white dark:bg-primary text-primary dark:text-white shadow-sm font-medium/g, 'text-slate-500 hover:text-primary dark:hover:text-white');
+                btn.classList.remove('active-range');
+            });
+            event.target.className = event.target.className.replace('text-slate-500 hover:text-primary dark:hover:text-white', 'bg-white dark:bg-primary text-primary dark:text-white shadow-sm font-medium');
+            event.target.classList.add('active-range');
+            renderChart();
+        }
+
+        // ---- Toast Notifications ----
+        function showToast(data) {
+            const container = $('toastContainer');
+            const toast = document.createElement('div');
+            const levelName = (data.new_level || 'INFO');
+            const colorMap = { 'WARNING': 'border-l-yellow-500 bg-yellow-500/5', 'DANGER': 'border-l-orange-500 bg-orange-500/5', 'CRITICAL': 'border-l-red-500 bg-red-500/5' };
+            const cls = colorMap[levelName] || 'border-l-primary bg-primary/5';
+
+            toast.className = `toast-animate p-3 rounded-lg bg-white dark:bg-panel-dark border border-slate-200 dark:border-slate-700 border-l-4 ${cls} shadow-xl min-w-[260px] max-w-[350px]`;
+            toast.innerHTML = `
+            <p class="text-xs font-bold text-slate-800 dark:text-white">⚠️ ${levelName}</p>
+            <p class="text-[10px] text-slate-500 mt-0.5">${data.message || 'Alert triggered'}</p>
+        `;
+            container.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 5000);
+        }
+
+        // ---- Periodic Status Poll ----
+        function pollStatus() {
+            fetch('/api/status')
+                .then(r => r.json())
+                .then(data => {
+                    // Camera
+                    if (data.camera) {
+                        if (data.camera.connected) {
+                            $('videoOverlay').style.display = 'none';
+                            $('cameraSourceBadge').textContent = data.camera.source;
+                            $('cameraSourceBadge').classList.remove('hidden');
+                            $('fpsDisplay').textContent = (data.camera.fps || 0).toFixed(0);
+                            $('liveDot').classList.add('animate-pulse');
+                        } else {
+                            $('videoOverlay').style.display = '';
+                            $('liveDot').classList.remove('animate-pulse');
+                        }
+                    }
+
+                    // Uptime
+                    if (data.system) {
+                        const secs = Math.floor(data.system.uptime || 0);
+                        const d = Math.floor(secs / 86400);
+                        const h = Math.floor((secs % 86400) / 3600);
+                        const m = Math.floor((secs % 3600) / 60);
+                        $('uptimeDisplay').textContent = d > 0 ? `UP: ${d}d ${String(h).padStart(2, '0')}h` : `UP: ${h}h ${String(m).padStart(2, '0')}m`;
+                    }
+
+                    // Channels
+                    if (data.alert && data.alert.channels) {
+                        const ch = data.alert.channels;
+                        setChannel('chWeb', ch.dashboard !== false);
+                        setChannel('chSms', ch.sms === true);
+                        setChannel('chBle', ch.ble === true);
+                        setChannel('chChat', ch.nostr === true);
+                    }
+                })
+                .catch(() => { });
+        }
+
+        function setChannel(id, active) {
+            const el = $(id);
+            if (active) {
+                el.className = el.className.replace(/text-slate-300 dark:text-slate-600/g, 'text-emerald-500');
+                if (!el.className.includes('text-emerald-500')) el.className += ' text-emerald-500';
+                const label = el.querySelector('span:last-child');
+                if (label) label.className = label.className.replace(/text-\[10px\]/, 'text-[10px] font-bold');
+            } else {
+                el.className = el.className.replace(/text-emerald-500/g, 'text-slate-300 dark:text-slate-600');
+            }
+        }
+
+        // ---- Actions ----
+        function testAlert() {
+            fetch('/api/test_alert', { method: 'POST' })
+                .then(r => r.json())
+                .then(() => showToast({ new_level: 'WARNING', message: 'Test alert sent through all channels' }))
+                .catch(e => console.error(e));
+        }
+
+        function stopSystem() {
+            if (confirm('Stop the monitoring system?')) {
+                // Could call a shutdown endpoint
+                showToast({ new_level: 'WARNING', message: 'System stop requested' });
+            }
+        }
+
+        // ---- Video feed error handling ----
+        $('videoFeed').addEventListener('error', () => { $('videoOverlay').style.display = ''; });
+
+        // ---- Modals & Settings ----
+        function openSettingsModal() {
+            const modal = $('settingsModal');
+            const content = $('settingsModalContent');
+            modal.classList.remove('hidden');
+
+            // Fetch current settings
+            fetch('/api/settings')
+                .then(r => r.json())
+                .then(data => {
+                    $('cfgDeviceId').value = data.sms_device_id || '';
+                    $('cfgRecipients').value = data.sms_recipients || '';
+                });
+
+            // Animate in
+            setTimeout(() => {
+                modal.classList.replace('opacity-0', 'opacity-100');
+                content.classList.replace('scale-95', 'scale-100');
+            }, 10);
+        }
+
+        function closeSettingsModal() {
+            const modal = $('settingsModal');
+            const content = $('settingsModalContent');
+
+            modal.classList.replace('opacity-100', 'opacity-0');
+            content.classList.replace('scale-100', 'scale-95');
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function saveSettings() {
+            const payload = {
+                sms_device_id: $('cfgDeviceId').value,
+                sms_recipients: $('cfgRecipients').value
+            };
+
+            fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+                .then(r => r.json())
+                .then(() => {
+                    closeSettingsModal();
+                    showToast({ new_level: 'NORMAL', message: 'Settings saved successfully' });
+                })
+                .catch(e => {
+                    showToast({ new_level: 'DANGER', message: 'Failed to save settings' });
+                    console.error(e);
+                });
+        }
+
+        // ---- Init ----
+        pollStatus();
+        setInterval(pollStatus, 3000);
+    </script>
+
+</body>
+
+</html>
