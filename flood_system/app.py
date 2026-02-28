@@ -20,7 +20,7 @@ import yaml
 
 from camera import CameraStream
 from detector import WaterLevelDetector
-from yolo_detector import YoloWaterDetector
+from stable_detector import StableWaterDetector
 from alerts import AlertManager
 from dashboard import Dashboard
 
@@ -59,13 +59,13 @@ class FloodWarningSystem:
         logger.info("Initializing Canny/Hough detector...")
         self.canny_detector = WaterLevelDetector(self.config)
 
-        logger.info("Initializing YOLO detector (lazy)...")
-        self.yolo_detector = YoloWaterDetector(self.config)
+        logger.info("Initializing Stable PRO detector...")
+        self.stable_detector = StableWaterDetector(self.config)
 
         # Set the active detector
-        if self.active_model == 'yolo':
-            self.yolo_detector.load()
-            self.detector = self.yolo_detector
+        if self.active_model == 'stable':
+            self.stable_detector.load()
+            self.detector = self.stable_detector
         else:
             self.detector = self.canny_detector
 
@@ -88,11 +88,11 @@ class FloodWarningSystem:
 
         logger.info(f"Switching detection model: {self.active_model} → {model_name}")
 
-        if model_name == 'yolo':
-            self.yolo_detector.load()
-            self.detector = self.yolo_detector
+        if model_name == 'stable':
+            self.stable_detector.load()
+            self.detector = self.stable_detector
         else:
-            self.yolo_detector.unload()
+            self.stable_detector.unload()
             self.detector = self.canny_detector
 
         self.active_model = model_name

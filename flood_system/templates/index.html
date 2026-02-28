@@ -554,98 +554,94 @@
                                         </div>
                                     </div>
                                 </label>
-                                <label id="modelCard-yolo" onclick="selectModel('yolo')"
+                                <label id="modelCard-stable" onclick="selectModel('stable')"
                                     class="cursor-pointer rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-transparent p-5 flex gap-4 items-start transition-all hover:shadow-lg relative">
                                     <div
                                         class="absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center">
-                                        <div id="modelDot-yolo" class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
+                                        <div id="modelDot-stable" class="w-2.5 h-2.5 rounded-full bg-transparent"></div>
                                     </div>
-                                    <span class="material-icons text-orange-500 text-3xl mt-0.5">hub</span>
+                                    <span class="material-icons text-emerald-500 text-3xl mt-0.5">calculate</span>
                                     <div>
-                                        <h4 class="font-bold text-slate-900 dark:text-white text-sm">YOLOv8 Water
-                                            Segmentation</h4>
-                                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">AI-powered water area
-                                            detection using a trained YOLOv8n model. Uses polygon intersection for level
-                                            measurement.</p>
+                                        <h4 class="font-bold text-slate-900 dark:text-white text-sm">Stable Horizontal
+                                            Math</h4>
+                                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Robust 1D convolution
+                                            and moving Median temporal filtering projection. Zero hallucination.</p>
                                         <div class="flex gap-2 mt-2">
                                             <span
-                                                class="text-[10px] px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 font-semibold">GPU/CPU</span>
+                                                class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-semibold">FAST
+                                                CPU</span>
                                             <span
-                                                class="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-semibold">NO
+                                                class="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold">NEEDS
                                                 ROI</span>
                                         </div>
                                     </div>
                                 </label>
                             </div>
                         </section>
-
-                        <!-- YOLO-Specific Settings (hidden when Canny is active) -->
-                        <section id="yoloSettings"
-                            class="bg-white dark:bg-[#1a202c] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm mb-8 hidden">
-                            <div
-                                class="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#111318]/50">
-                                <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                    <span class="material-icons text-orange-500 text-[20px]">hub</span> YOLO
-                                    Configuration
-                                </h3>
+                        <div
+                            class="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#111318]/50">
+                            <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <span class="material-icons text-orange-500 text-[20px]">hub</span> YOLO
+                                Configuration
+                            </h3>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="flex flex-col gap-4">
+                                <label class="flex flex-col gap-1.5">
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Reference
+                                        Line Start (x, y)</span>
+                                    <div class="flex gap-2">
+                                        <input id="cfgYoloLineStartX"
+                                            class="flex-1 rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                            type="number" value="1094" placeholder="X" />
+                                        <input id="cfgYoloLineStartY"
+                                            class="flex-1 rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                            type="number" value="231" placeholder="Y" />
+                                    </div>
+                                </label>
+                                <label class="flex flex-col gap-1.5">
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Reference
+                                        Line End (x, y)</span>
+                                    <div class="flex gap-2">
+                                        <input id="cfgYoloLineEndX"
+                                            class="flex-1 rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                            type="number" value="1083" placeholder="X" />
+                                        <input id="cfgYoloLineEndY"
+                                            class="flex-1 rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                            type="number" value="403" placeholder="Y" />
+                                    </div>
+                                </label>
                             </div>
-                            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="flex flex-col gap-4">
-                                    <label class="flex flex-col gap-1.5">
-                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Reference
-                                            Line Start (x, y)</span>
-                                        <div class="flex gap-2">
-                                            <input id="cfgYoloLineStartX"
-                                                class="flex-1 rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
-                                                type="number" value="1094" placeholder="X" />
-                                            <input id="cfgYoloLineStartY"
-                                                class="flex-1 rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
-                                                type="number" value="231" placeholder="Y" />
-                                        </div>
-                                    </label>
-                                    <label class="flex flex-col gap-1.5">
-                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Reference
-                                            Line End (x, y)</span>
-                                        <div class="flex gap-2">
-                                            <input id="cfgYoloLineEndX"
-                                                class="flex-1 rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
-                                                type="number" value="1083" placeholder="X" />
-                                            <input id="cfgYoloLineEndY"
-                                                class="flex-1 rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
-                                                type="number" value="403" placeholder="Y" />
-                                        </div>
-                                    </label>
-                                </div>
-                                <div class="flex flex-col gap-4">
-                                    <label class="flex flex-col gap-1.5">
-                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Pixels per
-                                            Meter</span>
-                                        <input id="cfgYoloPxPerMeter"
-                                            class="rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
-                                            type="number" value="15" />
-                                    </label>
-                                    <label class="flex flex-col gap-1.5">
-                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Tip Height
-                                            (meters)</span>
-                                        <input id="cfgYoloTipHeight"
-                                            class="rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
-                                            type="number" step="0.1" value="15" />
-                                    </label>
-                                    <label class="flex flex-col gap-1.5">
-                                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Minimum
-                                            Confidence (%)</span>
-                                        <input id="cfgYoloConfidence"
-                                            class="rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
-                                            type="number" step="1" min="1" max="100" value="50" />
-                                    </label>
-                                </div>
+                            <div class="flex flex-col gap-4">
+                                <label class="flex flex-col gap-1.5">
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Pixels per
+                                        Meter</span>
+                                    <input id="cfgYoloPxPerMeter"
+                                        class="rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                        type="number" value="15" />
+                                </label>
+                                <label class="flex flex-col gap-1.5">
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Tip Height
+                                        (meters)</span>
+                                    <input id="cfgYoloTipHeight"
+                                        class="rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                        type="number" step="0.1" value="15" />
+                                </label>
+                                <label class="flex flex-col gap-1.5">
+                                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Minimum
+                                        Confidence (%)</span>
+                                    <input id="cfgYoloConfidence"
+                                        class="rounded-lg bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white py-2.5 px-3 text-sm font-mono"
+                                        type="number" step="1" min="1" max="100" value="50" />
+                                </label>
                             </div>
-                            <div class="px-6 pb-6 flex justify-end">
-                                <button onclick="saveYoloSettings()"
-                                    class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-orange-500/20 flex items-center gap-2">
-                                    <span class="material-icons text-[18px]">save</span> Save YOLO Settings
-                                </button>
-                            </div>
+                        </div>
+                        <div class="px-6 pb-6 flex justify-end">
+                            <button onclick="saveYoloSettings()"
+                                class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-orange-500/20 flex items-center gap-2">
+                                <span class="material-icons text-[18px]">save</span> Save YOLO Settings
+                            </button>
+                        </div>
                         </section>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -751,53 +747,60 @@
                         </div>
                     </header>
                     <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
-                        <div class="flex-1 p-4 bg-slate-900 relative flex items-center justify-center overflow-hidden">
+                        <div
+                            class="flex-1 p-0 md:p-4 bg-slate-900 relative flex items-center justify-center min-h-[50vh]">
+                            <!-- Video Container uses w-full to fill available space but respects aspect ratio -->
                             <div
-                                class="relative w-full max-w-3xl aspect-video bg-black rounded-lg overflow-hidden shadow-2xl ring-1 ring-slate-800 shadow-[0_0_30px_rgba(0,0,0,1)]">
+                                class="relative w-full h-full max-h-full aspect-video bg-black md:rounded-lg overflow-hidden shadow-2xl ring-1 ring-slate-800 flex items-center justify-center">
+
                                 <img id="calibVideoFeed" src="/video_feed"
                                     class="absolute inset-0 w-full h-full object-contain opacity-60 pointer-events-none" />
+
                                 <div
                                     class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent pointer-events-none">
                                 </div>
-                                <!-- Interactive ROI Canvas -->
-                                <canvas id="roiCanvas"
-                                    class="absolute inset-0 w-full h-full object-contain cursor-crosshair z-10 pointer-events-auto"
-                                    title="Click and drag to draw Water ROI"></canvas>
 
                                 <div
-                                    class="absolute top-3 left-3 bg-black/80 backdrop-blur text-white px-2 py-1 rounded text-[10px] font-mono border border-white/20">
+                                    class="absolute top-3 left-3 bg-black/80 backdrop-blur text-white px-2 py-1 rounded text-[10px] font-mono border border-white/20 pointer-events-none z-10">
                                     LIVE PREVIEW DEMO
                                 </div>
 
-                                <!-- Decorative lines -->
-                                <div class="absolute w-full flex items-center border-t border-dashed border-red-500/50"
+                                <!-- Decorative lines (z-10, under canvas) -->
+                                <div class="absolute w-full flex items-center border-t border-dashed border-red-500/50 pointer-events-none z-10"
                                     style="top: 20%;">
                                     <div
                                         class="absolute right-2 -top-3 bg-red-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded">
                                         CRITICAL</div>
                                 </div>
-                                <div class="absolute w-full flex items-center border-t border-dashed border-orange-500/50"
+                                <div class="absolute w-full flex items-center border-t border-dashed border-orange-500/50 pointer-events-none z-10"
                                     style="top: 35%;">
                                     <div
                                         class="absolute right-2 -top-3 bg-orange-600 text-white text-[8px] font-bold px-1.5 py-0.5 rounded">
                                         DANGER</div>
                                 </div>
-                                <div class="absolute w-full flex items-center border-t border-dashed border-yellow-500/50"
+                                <div class="absolute w-full flex items-center border-t border-dashed border-yellow-500/50 pointer-events-none z-10"
                                     style="top: 55%;">
                                     <div
                                         class="absolute right-2 -top-3 bg-yellow-600 text-black text-[8px] font-bold px-1.5 py-0.5 rounded">
                                         WARNING</div>
                                 </div>
-                                <!-- Instruction Overlay -->
-                                <div id="roiInstruction"
-                                    class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur text-white/80 px-4 py-1.5 rounded-full text-xs pointer-events-none flex items-center gap-2 border border-white/10 z-20">
-                                    <span class="material-icons text-[14px] text-primary">touch_app</span>
-                                    Click and drag to set Region of Interest
+
+                                <!-- Instruction Overlay with Button -->
+                                <div
+                                    class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-50">
+                                    <button onclick="triggerNativeROI()"
+                                        class="pointer-events-auto bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] px-6 py-3 rounded-xl font-bold flex items-center gap-3 transition-all cursor-pointer border border-emerald-400">
+                                        <span class="material-icons">crop_free</span>
+                                        Draw Scan Zone (Native Window)
+                                    </button>
+                                    <p
+                                        class="text-[10px] text-emerald-200 mt-3 bg-black/50 px-3 py-1 rounded-full backdrop-blur pointer-events-none">
+                                        A new window will open to draw the exact box.</p>
                                 </div>
                             </div>
                         </div>
                         <div
-                            class="w-full lg:w-80 flex-shrink-0 bg-white dark:bg-[#111318] border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 flex flex-col h-[40vh] lg:h-auto overflow-y-auto">
+                            class="w-full lg:w-[350px] xl:w-[400px] flex-shrink-0 bg-white dark:bg-[#111318] border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 flex flex-col h-[40vh] lg:h-auto overflow-y-auto">
                             <div class="p-5 flex-1">
                                 <h2
                                     class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center justify-between">
@@ -1565,20 +1568,7 @@
                 updateModelUI(data.active_model || 'canny');
             });
 
-            // Fetch YOLO config
-            fetch('/api/yolo_config').then(r => r.json()).then(data => {
-                if (data.line_start) {
-                    $('cfgYoloLineStartX').value = data.line_start[0];
-                    $('cfgYoloLineStartY').value = data.line_start[1];
-                }
-                if (data.line_end) {
-                    $('cfgYoloLineEndX').value = data.line_end[0];
-                    $('cfgYoloLineEndY').value = data.line_end[1];
-                }
-                if (data.pixels_per_meter) $('cfgYoloPxPerMeter').value = data.pixels_per_meter;
-                if (data.tip_height) $('cfgYoloTipHeight').value = data.tip_height;
-                if (data.confidence) $('cfgYoloConfidence').value = Math.round(data.confidence * 100);
-            }).catch(() => { });
+
 
             switchTab('system'); // default tab
         }
@@ -1607,64 +1597,29 @@
         function updateModelUI(model) {
             _activeModel = model;
             const cannyCard = $('modelCard-canny');
-            const yoloCard = $('modelCard-yolo');
+            const stableCard = $('modelCard-stable');
             const cannyDot = $('modelDot-canny');
-            const yoloDot = $('modelDot-yolo');
-            const yoloSettings = $('yoloSettings');
-            const cameraTabBtn = $('tab-btn-camera');
+            const stableDot = $('modelDot-stable');
 
-            if (model === 'yolo') {
-                // YOLO active
-                yoloCard.className = 'cursor-pointer rounded-xl border-2 border-orange-500 bg-orange-500/5 p-5 flex gap-4 items-start transition-all hover:shadow-lg relative';
-                yoloDot.className = 'w-2.5 h-2.5 rounded-full bg-orange-500';
-                yoloDot.parentElement.className = 'absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-orange-500 flex items-center justify-center';
+            if (model === 'stable') {
+                // Stable active
+                stableCard.className = 'cursor-pointer rounded-xl border-2 border-emerald-500 bg-emerald-500/5 p-5 flex gap-4 items-start transition-all hover:shadow-lg relative';
+                stableDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+                stableDot.parentElement.className = 'absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-emerald-500 flex items-center justify-center';
+
                 cannyCard.className = 'cursor-pointer rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-transparent p-5 flex gap-4 items-start transition-all hover:shadow-lg relative';
                 cannyDot.className = 'w-2.5 h-2.5 rounded-full bg-transparent';
                 cannyDot.parentElement.className = 'absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center';
-                // Show YOLO settings, hide Camera Calibration tab
-                if (yoloSettings) yoloSettings.classList.remove('hidden');
-                if (cameraTabBtn) cameraTabBtn.classList.add('hidden');
-                // Also hide camera tab panel if open
-                const cameraTab = $('tab-camera');
-                if (cameraTab && !cameraTab.classList.contains('hidden')) switchTab('system');
             } else {
                 // Canny active
                 cannyCard.className = 'cursor-pointer rounded-xl border-2 border-primary bg-primary/5 p-5 flex gap-4 items-start transition-all hover:shadow-lg relative';
                 cannyDot.className = 'w-2.5 h-2.5 rounded-full bg-primary';
                 cannyDot.parentElement.className = 'absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center';
-                yoloCard.className = 'cursor-pointer rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-transparent p-5 flex gap-4 items-start transition-all hover:shadow-lg relative';
-                yoloDot.className = 'w-2.5 h-2.5 rounded-full bg-transparent';
-                yoloDot.parentElement.className = 'absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center';
-                // Hide YOLO settings, show Camera Calibration tab
-                if (yoloSettings) yoloSettings.classList.add('hidden');
-                if (cameraTabBtn) cameraTabBtn.classList.remove('hidden');
-            }
 
-            // Update mobile select options
-            const mobileSelect = $('mobileTabSelect');
-            if (mobileSelect) {
-                const cameraOpt = mobileSelect.querySelector('option[value="camera"]');
-                if (cameraOpt) cameraOpt.style.display = model === 'yolo' ? 'none' : '';
+                stableCard.className = 'cursor-pointer rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-transparent p-5 flex gap-4 items-start transition-all hover:shadow-lg relative';
+                stableDot.className = 'w-2.5 h-2.5 rounded-full bg-transparent';
+                stableDot.parentElement.className = 'absolute top-3 right-3 w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center';
             }
-        }
-
-        function saveYoloSettings() {
-            const payload = {
-                line_start: [parseInt($('cfgYoloLineStartX').value), parseInt($('cfgYoloLineStartY').value)],
-                line_end: [parseInt($('cfgYoloLineEndX').value), parseInt($('cfgYoloLineEndY').value)],
-                pixels_per_meter: parseFloat($('cfgYoloPxPerMeter').value),
-                tip_height: parseFloat($('cfgYoloTipHeight').value),
-                confidence: parseFloat($('cfgYoloConfidence').value) / 100.0
-            };
-            fetch('/api/yolo_config', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }).then(r => r.json()).then(() => {
-                showToast({ new_level: 'NORMAL', message: 'YOLO configuration saved.' });
-            }).catch(() => {
-                showToast({ new_level: 'DANGER', message: 'Failed to save YOLO config.' });
-            });
         }
 
         // ==========================================
@@ -1704,139 +1659,37 @@
         window.addEventListener('resize', setupROICanvas);
         if (calibFeed) calibFeed.onload = setupROICanvas;
 
-        if (roiCanvas) {
-            roiCanvas.addEventListener('mousedown', (e) => {
-                if (_activeModel === 'yolo') return; // Only used for Canny
-                const rect = roiCanvas.getBoundingClientRect();
-                startX = e.clientX - rect.left;
-                startY = e.clientY - rect.top;
-                isDrawing = true;
-            });
+        // ==========================================
+        // Native OpenCV ROI Logic
+        // ==========================================
 
-            roiCanvas.addEventListener('mousemove', (e) => {
-                if (!isDrawing) return;
-                const rect = roiCanvas.getBoundingClientRect();
-                currentX = e.clientX - rect.left;
-                currentY = e.clientY - rect.top;
+        function triggerNativeROI() {
+            showToast({ new_level: 'WARNING', message: 'Opening Native OpenCV Window. Check your taskbar.' });
 
-                // Clear and draw active selection box
-                roiCtx.clearRect(0, 0, roiCanvas.width, roiCanvas.height);
-                drawCanvasRect(); // keep old/existing context
+            fetch('/api/trigger_opencv_roi', {
+                method: 'POST'
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success' && data.roi) {
+                        const roi = data.roi; // [y1, y2, x1, x2]
 
-                // Draw current drag box
-                roiCtx.strokeStyle = '#135bec'; // Primary blue
-                roiCtx.lineWidth = 2;
-                roiCtx.setLineDash([5, 5]);
-                roiCtx.strokeRect(startX, startY, currentX - startX, currentY - startY);
-                roiCtx.fillStyle = 'rgba(19, 91, 236, 0.2)';
-                roiCtx.fillRect(startX, startY, currentX - startX, currentY - startY);
-                roiCtx.setLineDash([]);
-            });
+                        if ($('cfgRoiY1')) {
+                            $('cfgRoiY1').value = roi[0];
+                            $('cfgRoiY2').value = roi[1];
+                            $('cfgRoiX1').value = roi[2];
+                            $('cfgRoiX2').value = roi[3];
+                        }
 
-            roiCanvas.addEventListener('mouseup', (e) => {
-                if (!isDrawing) return;
-                isDrawing = false;
-
-                // Calculate bounding box in CSS coordinates
-                const xMin = Math.min(startX, currentX);
-                const xMax = Math.max(startX, currentX);
-                const yMin = Math.min(startY, currentY);
-                const yMax = Math.max(startY, currentY);
-
-                // Ignore tiny clicks
-                if (xMax - xMin < 10 || yMax - yMin < 10) return;
-
-                // Map canvas CSS pixels -> Object Fit scaled image -> Native video pixels
-                // calculate object-contain dimensions
-                const canvasRatio = roiCanvas.width / roiCanvas.height;
-                const videoRatio = videoNaturalWidth / videoNaturalHeight;
-
-                let renderedWidth, renderedHeight, offsetX, offsetY;
-
-                if (canvasRatio > videoRatio) {
-                    // Pillarboxed (bars on sides)
-                    renderedHeight = roiCanvas.height;
-                    renderedWidth = renderedHeight * videoRatio;
-                    offsetX = (roiCanvas.width - renderedWidth) / 2;
-                    offsetY = 0;
-                } else {
-                    // Letterboxed (bars top/bottom)
-                    renderedWidth = roiCanvas.width;
-                    renderedHeight = renderedWidth / videoRatio;
-                    offsetX = 0;
-                    offsetY = (roiCanvas.height - renderedHeight) / 2;
-                }
-
-                // Map CSS coordinates relative to the rendered image bounds
-                const nativeXMin = Math.max(0, (xMin - offsetX) / renderedWidth) * videoNaturalWidth;
-                const nativeXMax = Math.min(1, (xMax - offsetX) / renderedWidth) * videoNaturalWidth;
-                const nativeYMin = Math.max(0, (yMin - offsetY) / renderedHeight) * videoNaturalHeight;
-                const nativeYMax = Math.min(1, (yMax - offsetY) / renderedHeight) * videoNaturalHeight;
-
-                drawnROI = {
-                    x1: Math.round(nativeXMin),
-                    x2: Math.round(nativeXMax),
-                    y1: Math.round(nativeYMin),
-                    y2: Math.round(nativeYMax)
-                };
-
-                // Sync textboxes 
-                if ($('cfgRoiY1')) {
-                    $('cfgRoiY1').value = drawnROI.y1;
-                    $('cfgRoiY2').value = drawnROI.y2;
-                    $('cfgRoiX1').value = drawnROI.x1;
-                    $('cfgRoiX2').value = drawnROI.x2;
-                }
-
-                const instr = $('roiInstruction');
-                if (instr) instr.innerHTML = `<span class="material-icons text-[14px] text-emerald-400">check_circle</span> ROI Selected: ${drawnROI.x1},${drawnROI.y1} to ${drawnROI.x2},${drawnROI.y2}`;
-
-                drawCanvasRect();
-            });
-        }
-
-        function drawCanvasRect() {
-            if (!roiCtx || !drawnROI) return;
-            roiCtx.clearRect(0, 0, roiCanvas.width, roiCanvas.height);
-
-            // Map native ROI back to CSS rendering coordinates for display
-            const canvasRatio = roiCanvas.width / roiCanvas.height;
-            const videoRatio = videoNaturalWidth / videoNaturalHeight;
-            let renderedWidth, renderedHeight, offsetX, offsetY;
-
-            if (canvasRatio > videoRatio) {
-                renderedHeight = roiCanvas.height;
-                renderedWidth = renderedHeight * videoRatio;
-                offsetX = (roiCanvas.width - renderedWidth) / 2;
-                offsetY = 0;
-            } else {
-                renderedWidth = roiCanvas.width;
-                renderedHeight = renderedWidth / videoRatio;
-                offsetX = 0;
-                offsetY = (roiCanvas.height - renderedHeight) / 2;
-            }
-
-            const cssX1 = (drawnROI.x1 / videoNaturalWidth) * renderedWidth + offsetX;
-            const cssX2 = (drawnROI.x2 / videoNaturalWidth) * renderedWidth + offsetX;
-            const cssY1 = (drawnROI.y1 / videoNaturalHeight) * renderedHeight + offsetY;
-            const cssY2 = (drawnROI.y2 / videoNaturalHeight) * renderedHeight + offsetY;
-
-            // Draw
-            roiCtx.strokeStyle = '#10b981'; // Emerald
-            roiCtx.lineWidth = 2;
-            roiCtx.strokeRect(cssX1, cssY1, cssX2 - cssX1, cssY2 - cssY1);
-
-            // Tint outside
-            roiCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            roiCtx.fillRect(0, 0, roiCanvas.width, cssY1); // top
-            roiCtx.fillRect(0, cssY1, cssX1, cssY2 - cssY1); // left
-            roiCtx.fillRect(cssX2, cssY1, roiCanvas.width - cssX2, cssY2 - cssY1); // right
-            roiCtx.fillRect(0, cssY2, roiCanvas.width, roiCanvas.height - cssY2); // bottom
-
-            // Label
-            roiCtx.fillStyle = '#10b981';
-            roiCtx.font = "12px monospace";
-            roiCtx.fillText("Active ROI", cssX1 + 4, cssY1 + 14);
+                        showToast({ new_level: 'NORMAL', message: `ROI Captured: ${roi[2]},${roi[0]} to ${roi[3]},${roi[1]}` });
+                    } else if (data.error) {
+                        showToast({ new_level: 'DANGER', message: data.error });
+                    }
+                })
+                .catch(e => {
+                    showToast({ new_level: 'DANGER', message: 'Failed to communicate with ROI endpoint' });
+                    console.error(e);
+                });
         }
 
         // ---- Init ----

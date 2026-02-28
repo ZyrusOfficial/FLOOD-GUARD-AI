@@ -163,6 +163,71 @@ class Dashboard:
             logger.info("Settings updated and saved to config.yaml")
             return jsonify({'status': 'success'})
 
+        @self.app.route('/api/trigger_opencv_roi', methods=['POST'])
+        def trigger_opencv_roi():
+            import cv2
+            """Launch native OS window for precise GUI-based ROI drawing."""
+            frame = self.camera.read()
+            if frame is None:
+                return jsonify({'error': 'No camera feed available to calibrate'}), 400
+
+            logger.info("Triggering Native OpenCV ROI Selector...")
+            
+            roi_points = []
+            selecting = [True]
+            
+            def select_roi(event, x, y, flags, param):
+                if event == cv2.EVENT_LBUTTONDOWN:
+                    roi_points.append((x, y))
+                    if len(roi_points) == 2:
+                        param[0] = False # Stop selecting
+
+            window_name = 'Alerto Capas - Draw Ruler Zone'
+            cv2.namedWindow(window_name)
+            cv2.setMouseCallback(window_name, select_roi, selecting)
+
+            while selecting[0] and len(roi_points) < 2:
+                display = frame.copy()
+                if len(roi_points) == 1:
+                    cv2.circle(display, roi_points[0], 5, (0, 0, 255), -1)
+                    cv2.putText(display, "Click Bottom-Right", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                else:
+                    cv2.putText(display, "Click TOP-LEFT of Ruler", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                    
+                cv2.imshow(window_name, display)
+                
+                # Press 'c' to cancel
+                key = cv2.waitKey(30) & 0xFF
+                if key == ord('c') or key == 27: # c or ESC
+                    break
+
+            cv2.destroyWindow(window_name)
+            # Necessary for Wayland to flush the window destruction
+            for _ in range(4): cv2.waitKey(1) 
+
+            if len(roi_points) == 2:
+                x1 = min(roi_points[0][0], roi_points[1][0])
+                y1 = min(roi_points[0][1], roi_points[1][1])
+                x2 = max(roi_points[0][0], roi_points[1][0])
+                y2 = max(roi_points[0][1], roi_points[1][1])
+                
+                new_roi = [y1, y2, x1, x2]
+                logger.info(f"Native OpenCV ROI Selected: {new_roi}")
+                
+                # Save and Apply
+                self.config['detection']['roi'] = new_roi
+                if self.system and self.system.detector:
+                    self.system.detector.update_roi(new_roi)
+                self._save_config()
+                
+                return jsonify({
+                    'status': 'success',
+                    'roi': new_roi
+                })
+            else:
+                logger.warning("Native OpenCV ROI Selection cancelled by user.")
+                return jsonify({'error': 'Selection cancelled'}), 400
+
         @self.app.route('/api/test_alert', methods=['POST'])
         def test_alert():
             """Send a test alert through all channels."""
@@ -174,50 +239,19 @@ class Dashboard:
             if request.method == 'GET':
                 return jsonify({
                     'active_model': self.config['detection'].get('active_model', 'canny'),
-                    'available': ['canny', 'yolo']
+                    'available': ['canny', 'stable']
                 })
             elif request.method == 'POST':
                 data = request.get_json()
                 model_name = data.get('model', 'canny')
-                if model_name not in ('canny', 'yolo'):
+                if model_name not in ('canny', 'stable'):
                     return jsonify({'error': 'Invalid model'}), 400
                 if self.system:
                     result = self.system.switch_model(model_name)
                     return jsonify({'active_model': result, 'status': 'ok'})
                 return jsonify({'error': 'System not available'}), 500
 
-        @self.app.route('/api/yolo_config', methods=['GET', 'POST'])
-        def api_yolo_config():
-            yolo_cfg = self.config['detection'].get('yolo', {})
-            if request.method == 'GET':
-                return jsonify(yolo_cfg)
-            elif request.method == 'POST':
-                data = request.get_json()
-                if 'line_start' in data:
-                    yolo_cfg['line_start'] = data['line_start']
-                if 'line_end' in data:
-                    yolo_cfg['line_end'] = data['line_end']
-                if 'pixels_per_meter' in data:
-                    yolo_cfg['pixels_per_meter'] = float(data['pixels_per_meter'])
-                if 'tip_height' in data:
-                    yolo_cfg['tip_height'] = float(data['tip_height'])
-                if 'confidence' in data:
-                    yolo_cfg['confidence'] = float(data['confidence'])
-                self.config['detection']['yolo'] = yolo_cfg
-                self._save_config()
-                # Update live YOLO detector if available
-                if self.system and hasattr(self.system, 'yolo_detector'):
-                    yd = self.system.yolo_detector
-                    yd.update_line(
-                        yolo_cfg.get('line_start', [1094, 231]),
-                        yolo_cfg.get('line_end', [1083, 403])
-                    )
-                    yd.update_scale(
-                        yolo_cfg.get('pixels_per_meter', 15),
-                        yolo_cfg.get('tip_height', 15),
-                        yolo_cfg.get('confidence', 0.5)
-                    )
-                return jsonify({'status': 'ok'})
+
 
     def _save_config(self):
         """Save current config to YAML file."""
