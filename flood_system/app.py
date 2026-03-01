@@ -40,6 +40,7 @@ class FloodWarningSystem:
         import os
         # Load configuration
         abs_config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), config_path)
+        self.config_path = abs_config_path
         with open(abs_config_path, 'r') as f:
             self.config = yaml.safe_load(f)
 
@@ -102,7 +103,7 @@ class FloodWarningSystem:
         # Persist to config
         try:
             import yaml
-            with open('config.yaml', 'w') as f:
+            with open(self.config_path, 'w') as f:
                 yaml.dump(self.config, f, default_flow_style=False)
         except Exception as e:
             logger.error(f"Failed to save config: {e}")
@@ -160,22 +161,32 @@ class FloodWarningSystem:
         interval = 1.0 / self.config['camera']['max_fps']
 
         while self._running:
-            frame = self.camera.read()
-            if frame is None:
-                time.sleep(0.5)
-                continue
+            try:
+                frame = self.camera.read()
+                if frame is None:
+                    time.sleep(0.5)
+                    continue
 
-            # Detect water level
-            result = self.detector.detect(frame)
+                # Detect water level, requesting visual annotations
+                try:
+                    result = self.detector.detect(frame, draw=True)
+                except TypeError:
+                    # Fallback for models that don't accept 'draw' kwarg
+                    result = self.detector.detect(frame)
 
-            # Update dashboard
-            self.dashboard.update(result)
+                # Update dashboard
+                self.dashboard.update(result)
 
-            # Evaluate alerts
-            if result['water_level_cm'] is not None:
-                self.alert_manager.evaluate(result['water_level_cm'])
+                # Evaluate alerts
+                if result.get('water_level_cm') is not None:
+                    self.alert_manager.evaluate(result['water_level_cm'])
 
-            time.sleep(interval)
+                time.sleep(interval)
+            except Exception as e:
+                import traceback
+                logger.error(f"Detection thread crashed: {e}")
+                logger.error(traceback.format_exc())
+                time.sleep(1)
 
     def stop(self):
         """Graceful shutdown."""

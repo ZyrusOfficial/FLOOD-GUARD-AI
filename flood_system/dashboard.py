@@ -135,8 +135,13 @@ class Dashboard:
                     # Ensure it is a list of 4 ints: y1, y2, x1, x2
                     if isinstance(new_roi, list) and len(new_roi) == 4:
                         self.config['detection']['roi'] = new_roi
-                        # Propagate immediately to detector
-                        if hasattr(self.detector, 'update_roi'):
+                        # Propagate immediately to both detectors via system reference
+                        if self.system:
+                            if hasattr(self.system, 'canny_detector') and hasattr(self.system.canny_detector, 'update_roi'):
+                                self.system.canny_detector.update_roi(new_roi)
+                            if hasattr(self.system, 'stable_detector') and hasattr(self.system.stable_detector, 'update_roi'):
+                                self.system.stable_detector.update_roi(new_roi)
+                        elif hasattr(self.detector, 'update_roi'):
                             self.detector.update_roi(new_roi)
                         logger.info(f"ROI updated from dashboard: {new_roi}")
                 self._save_config()
@@ -163,70 +168,6 @@ class Dashboard:
             logger.info("Settings updated and saved to config.yaml")
             return jsonify({'status': 'success'})
 
-        @self.app.route('/api/trigger_opencv_roi', methods=['POST'])
-        def trigger_opencv_roi():
-            import cv2
-            """Launch native OS window for precise GUI-based ROI drawing."""
-            frame = self.camera.read()
-            if frame is None:
-                return jsonify({'error': 'No camera feed available to calibrate'}), 400
-
-            logger.info("Triggering Native OpenCV ROI Selector...")
-            
-            roi_points = []
-            selecting = [True]
-            
-            def select_roi(event, x, y, flags, param):
-                if event == cv2.EVENT_LBUTTONDOWN:
-                    roi_points.append((x, y))
-                    if len(roi_points) == 2:
-                        param[0] = False # Stop selecting
-
-            window_name = 'Alerto Capas - Draw Ruler Zone'
-            cv2.namedWindow(window_name)
-            cv2.setMouseCallback(window_name, select_roi, selecting)
-
-            while selecting[0] and len(roi_points) < 2:
-                display = frame.copy()
-                if len(roi_points) == 1:
-                    cv2.circle(display, roi_points[0], 5, (0, 0, 255), -1)
-                    cv2.putText(display, "Click Bottom-Right", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-                else:
-                    cv2.putText(display, "Click TOP-LEFT of Ruler", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                    
-                cv2.imshow(window_name, display)
-                
-                # Press 'c' to cancel
-                key = cv2.waitKey(30) & 0xFF
-                if key == ord('c') or key == 27: # c or ESC
-                    break
-
-            cv2.destroyWindow(window_name)
-            # Necessary for Wayland to flush the window destruction
-            for _ in range(4): cv2.waitKey(1) 
-
-            if len(roi_points) == 2:
-                x1 = min(roi_points[0][0], roi_points[1][0])
-                y1 = min(roi_points[0][1], roi_points[1][1])
-                x2 = max(roi_points[0][0], roi_points[1][0])
-                y2 = max(roi_points[0][1], roi_points[1][1])
-                
-                new_roi = [y1, y2, x1, x2]
-                logger.info(f"Native OpenCV ROI Selected: {new_roi}")
-                
-                # Save and Apply
-                self.config['detection']['roi'] = new_roi
-                if self.system and self.system.detector:
-                    self.system.detector.update_roi(new_roi)
-                self._save_config()
-                
-                return jsonify({
-                    'status': 'success',
-                    'roi': new_roi
-                })
-            else:
-                logger.warning("Native OpenCV ROI Selection cancelled by user.")
-                return jsonify({'error': 'Selection cancelled'}), 400
 
         @self.app.route('/api/test_alert', methods=['POST'])
         def test_alert():
@@ -257,7 +198,8 @@ class Dashboard:
         """Save current config to YAML file."""
         import yaml
         try:
-            with open('config.yaml', 'w') as f:
+            config_file = self.system.config_path if self.system else 'config.yaml'
+            with open(config_file, 'w') as f:
                 yaml.dump(self.config, f, default_flow_style=False)
         except Exception as e:
             logger.error(f"Failed to save config: {e}")
@@ -281,8 +223,13 @@ class Dashboard:
             with self._latest_lock:
                 result = self._latest_result
 
-            if result and 'annotated_frame' in result:
-                frame = result['annotated_frame']
+            if result:
+                if 'annotated_frame' in result:
+                    frame = result['annotated_frame']
+                elif 'output_frame' in result:
+                    frame = result['output_frame']
+                else:
+                    frame = self.camera.read()
             else:
                 frame = self.camera.read()
 

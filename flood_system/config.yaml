@@ -22,7 +22,7 @@ dashboard:
   port: 5000
   update_interval: 1000
 detection:
-  active_model: canny
+  active_model: stable
   calibration:
     bottom_cm: 170
     bottom_px: 1310
@@ -35,10 +35,10 @@ detection:
   hough_rho: 1
   hough_threshold: 15
   roi:
-  - 70
-  - 333
-  - 413
-  - 579
+  - 149
+  - 381
+  - 451
+  - 673
   smoothing_window: 5
   water_level_offset: 150
   yolo:

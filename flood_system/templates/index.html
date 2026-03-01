@@ -746,9 +746,9 @@
                                 alert levels.</p>
                         </div>
                     </header>
-                    <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
+                    <div class="flex flex-col lg:flex-row flex-1 overflow-hidden min-h-0">
                         <div
-                            class="flex-1 p-0 md:p-4 bg-slate-900 relative flex items-center justify-center min-h-[50vh]">
+                            class="flex-1 p-0 md:p-4 bg-slate-900 relative flex items-center justify-center min-h-[40vh] lg:min-h-0 overflow-hidden">
                             <!-- Video Container uses w-full to fill available space but respects aspect ratio -->
                             <div
                                 class="relative w-full h-full max-h-full aspect-video bg-black md:rounded-lg overflow-hidden shadow-2xl ring-1 ring-slate-800 flex items-center justify-center">
@@ -785,22 +785,21 @@
                                         WARNING</div>
                                 </div>
 
-                                <!-- Instruction Overlay with Button -->
-                                <div
-                                    class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-50">
-                                    <button onclick="triggerNativeROI()"
-                                        class="pointer-events-auto bg-emerald-600 hover:bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] px-6 py-3 rounded-xl font-bold flex items-center gap-3 transition-all cursor-pointer border border-emerald-400">
-                                        <span class="material-icons">crop_free</span>
-                                        Draw Scan Zone (Native Window)
-                                    </button>
-                                    <p
-                                        class="text-[10px] text-emerald-200 mt-3 bg-black/50 px-3 py-1 rounded-full backdrop-blur pointer-events-none">
-                                        A new window will open to draw the exact box.</p>
+                                <!-- Instruction Overlay (z-10, under canvas) -->
+                                <div id="roiInstruction"
+                                    class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/60 backdrop-blur text-white/80 px-4 py-1.5 rounded-full text-xs pointer-events-none flex items-center gap-2 border border-white/10 z-10 transition-all">
+                                    <span class="material-icons text-[14px] text-primary">touch_app</span>
+                                    Click <b>TOP-LEFT</b> corner of the ROI
                                 </div>
+
+                                <!-- Interactive ROI Canvas MUST BE HIGHEST Z-INDEX (z-50) so it is always clickable -->
+                                <canvas id="roiCanvas"
+                                    class="absolute inset-0 w-full h-full object-contain cursor-crosshair z-50 pointer-events-auto"
+                                    title="Click and drag to draw Water ROI"></canvas>
                             </div>
                         </div>
                         <div
-                            class="w-full lg:w-[350px] xl:w-[400px] flex-shrink-0 bg-white dark:bg-[#111318] border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 flex flex-col h-[40vh] lg:h-auto overflow-y-auto">
+                            class="w-full lg:w-[350px] xl:w-[400px] shrink-0 bg-white dark:bg-[#111318] border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 flex flex-col h-[45vh] lg:h-full overflow-y-auto">
                             <div class="p-5 flex-1">
                                 <h2
                                     class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center justify-between">
@@ -837,47 +836,49 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <!-- NEW MANUAL ROI SECTION -->
-                        <div class="p-5 border-t border-slate-200 dark:border-slate-800">
-                            <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3">Manual ROI
-                                (Pixels)</h2>
-                            <div class="grid grid-cols-2 gap-3">
-                                <label
-                                    class="flex justify-between items-center text-[10px] font-medium text-slate-500">Top
-                                    Y:
-                                    <input id="cfgRoiY1" type="number"
-                                        class="w-16 bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded px-2 py-1 text-slate-900 dark:text-white font-mono outline-none"
-                                        placeholder="auto">
-                                </label>
-                                <label
-                                    class="flex justify-between items-center text-[10px] font-medium text-slate-500">Bot
-                                    Y:
-                                    <input id="cfgRoiY2" type="number"
-                                        class="w-16 bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded px-2 py-1 text-slate-900 dark:text-white font-mono outline-none"
-                                        placeholder="auto">
-                                </label>
-                                <label
-                                    class="flex justify-between items-center text-[10px] font-medium text-slate-500">Left
-                                    X:
-                                    <input id="cfgRoiX1" type="number"
-                                        class="w-16 bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded px-2 py-1 text-slate-900 dark:text-white font-mono outline-none"
-                                        placeholder="auto">
-                                </label>
-                                <label
-                                    class="flex justify-between items-center text-[10px] font-medium text-slate-500">Right
-                                    X:
-                                    <input id="cfgRoiX2" type="number"
-                                        class="w-16 bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded px-2 py-1 text-slate-900 dark:text-white font-mono outline-none"
-                                        placeholder="auto">
-                                </label>
+                            <!-- NEW MANUAL ROI SECTION -->
+                            <div class="p-5 border-t border-slate-200 dark:border-slate-800 shrink-0">
+                                <h2 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3">Manual
+                                    ROI
+                                    (Pixels)</h2>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label
+                                        class="flex justify-between items-center text-[10px] font-medium text-slate-500">Top
+                                        Y:
+                                        <input id="cfgRoiY1" type="number"
+                                            class="w-16 bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded px-2 py-1 text-slate-900 dark:text-white font-mono outline-none"
+                                            placeholder="auto">
+                                    </label>
+                                    <label
+                                        class="flex justify-between items-center text-[10px] font-medium text-slate-500">Bot
+                                        Y:
+                                        <input id="cfgRoiY2" type="number"
+                                            class="w-16 bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded px-2 py-1 text-slate-900 dark:text-white font-mono outline-none"
+                                            placeholder="auto">
+                                    </label>
+                                    <label
+                                        class="flex justify-between items-center text-[10px] font-medium text-slate-500">Left
+                                        X:
+                                        <input id="cfgRoiX1" type="number"
+                                            class="w-16 bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded px-2 py-1 text-slate-900 dark:text-white font-mono outline-none"
+                                            placeholder="auto">
+                                    </label>
+                                    <label
+                                        class="flex justify-between items-center text-[10px] font-medium text-slate-500">Right
+                                        X:
+                                        <input id="cfgRoiX2" type="number"
+                                            class="w-16 bg-slate-50 dark:bg-[#1c1f27] border border-slate-200 dark:border-[#3b4354] rounded px-2 py-1 text-slate-900 dark:text-white font-mono outline-none"
+                                            placeholder="auto">
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="p-4 bg-slate-50 dark:bg-[#0b0e14] border-t border-slate-200 dark:border-slate-800">
-                            <button onclick="saveLevels()"
-                                class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold py-2.5 px-4 rounded-lg transition-all shadow shadow-primary/20 text-sm">
-                                <span class="material-icons text-[16px]">save</span> Save Calibration
-                            </button>
+                            <div
+                                class="p-4 bg-slate-50 dark:bg-[#0b0e14] border-t border-slate-200 dark:border-slate-800 shrink-0 sticky bottom-0 z-20">
+                                <button onclick="saveLevels()"
+                                    class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold py-2.5 px-4 rounded-lg transition-all shadow shadow-primary/20 text-sm">
+                                    <span class="material-icons text-[16px]">save</span> Save Calibration
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1429,6 +1430,11 @@
             // Update mobile select
             const mobileSelect = document.getElementById('mobileTabSelect');
             if (mobileSelect) mobileSelect.value = tabId;
+
+            // Re-calculate the Canvas size once the element is no longer display: none !important
+            if (tabId === 'camera') {
+                setTimeout(setupROICanvas, 50);
+            }
         }
 
         function saveCameraSettings() {
@@ -1560,7 +1566,6 @@
             setTimeout(() => {
                 modal.classList.replace('opacity-0', 'opacity-100');
                 content.classList.replace('scale-95', 'scale-100');
-                setupROICanvas(); // Ensure canvas matches img boundaries once rendered
             }, 10);
 
             // Fetch active model and update UI
@@ -1630,66 +1635,207 @@
         let roiCtx = null;
         if (roiCanvas) roiCtx = roiCanvas.getContext('2d');
 
-        let isDrawing = false;
-        let startX, startY;
-        let currentX, currentY;
-
-        // Final mapped native resolution coordinates
-        // matching python detector config format: [y1, y2, x1, x2]
-        let drawnROI = null;
-
-        // Original video aspect tracking for object-contain mapping
-        let videoNaturalWidth = 1920;
-        let videoNaturalHeight = 1080;
-
         function setupROICanvas() {
             if (!roiCanvas || !calibFeed) return;
-            // Match canvas logical size to element size
-            roiCanvas.width = roiCanvas.clientWidth;
-            roiCanvas.height = roiCanvas.clientHeight;
-
             // Try to extract actual stream resolution if possible
             if (calibFeed.naturalWidth) {
                 videoNaturalWidth = calibFeed.naturalWidth;
                 videoNaturalHeight = calibFeed.naturalHeight;
             }
-            drawCanvasRect(); // redraw if preloaded
         }
 
-        window.addEventListener('resize', setupROICanvas);
+        // Bulletproof auto-resizer to fix 0x0 bug when tabs switch
+        if (roiCanvas) {
+            const resizeObserver = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                    const { width, height } = entry.contentRect;
+                    if (width > 0 && height > 0) {
+                        if (roiCanvas.width !== width || roiCanvas.height !== height) {
+                            roiCanvas.width = width;
+                            roiCanvas.height = height;
+                            setupROICanvas(); // update video stream properties
+                            if (drawnROI) drawCanvasRect();
+                        }
+                    }
+                }
+            });
+            resizeObserver.observe(roiCanvas);
+        }
+
         if (calibFeed) calibFeed.onload = setupROICanvas;
 
-        // ==========================================
-        // Native OpenCV ROI Logic
-        // ==========================================
+        let clickPoints = []; // Stores up to 2 clicks
 
-        function triggerNativeROI() {
-            showToast({ new_level: 'WARNING', message: 'Opening Native OpenCV Window. Check your taskbar.' });
+        if (roiCanvas) {
+            roiCanvas.addEventListener('click', (e) => {
+                if (_activeModel === 'yolo') return; // Only used for Canny
 
-            fetch('/api/trigger_opencv_roi', {
-                method: 'POST'
-            })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.status === 'success' && data.roi) {
-                        const roi = data.roi; // [y1, y2, x1, x2]
+                const rect = roiCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
 
-                        if ($('cfgRoiY1')) {
-                            $('cfgRoiY1').value = roi[0];
-                            $('cfgRoiY2').value = roi[1];
-                            $('cfgRoiX1').value = roi[2];
-                            $('cfgRoiX2').value = roi[3];
-                        }
+                if (clickPoints.length >= 2) {
+                    // Reset on 3rd click to draw a new box
+                    clickPoints = [];
+                    drawnROI = null;
+                    $('roiInstruction').innerHTML = `<span class="material-icons text-[14px] text-primary">touch_app</span> Click the <b>TOP-LEFT</b> corner of the ROI`;
+                    roiCtx.clearRect(0, 0, roiCanvas.width, roiCanvas.height);
+                }
 
-                        showToast({ new_level: 'NORMAL', message: `ROI Captured: ${roi[2]},${roi[0]} to ${roi[3]},${roi[1]}` });
-                    } else if (data.error) {
-                        showToast({ new_level: 'DANGER', message: data.error });
+                clickPoints.push({ x, y });
+
+                if (clickPoints.length === 1) {
+                    $('roiInstruction').innerHTML = `<span class="material-icons text-[14px] text-orange-400">touch_app</span> Click the <b>BOTTOM-RIGHT</b> corner`;
+                    isDrawing = true;
+
+                    // Immediately draw the point so user sees where they clicked
+                    roiCtx.clearRect(0, 0, roiCanvas.width, roiCanvas.height);
+                    roiCtx.beginPath();
+                    roiCtx.arc(x, y, 5, 0, 2 * Math.PI);
+                    roiCtx.fillStyle = '#10b981';
+                    roiCtx.fill();
+
+                } else if (clickPoints.length === 2) {
+                    isDrawing = false;
+
+                    const xMin = Math.min(clickPoints[0].x, clickPoints[1].x);
+                    const xMax = Math.max(clickPoints[0].x, clickPoints[1].x);
+                    const yMin = Math.min(clickPoints[0].y, clickPoints[1].y);
+                    const yMax = Math.max(clickPoints[0].y, clickPoints[1].y);
+
+                    // Ignore tiny clicks (accidental double clicks)
+                    if (xMax - xMin < 10 || yMax - yMin < 10) {
+                        clickPoints = [];
+                        $('roiInstruction').innerHTML = `<span class="material-icons text-[14px] text-red-500">error</span> Too small. Click <b>TOP-LEFT</b> again.`;
+                        roiCtx.clearRect(0, 0, roiCanvas.width, roiCanvas.height);
+                        return;
                     }
-                })
-                .catch(e => {
-                    showToast({ new_level: 'DANGER', message: 'Failed to communicate with ROI endpoint' });
-                    console.error(e);
-                });
+
+                    // Map to Native Video pixels
+                    const canvasRatio = roiCanvas.width / roiCanvas.height;
+                    const videoRatio = videoNaturalWidth / videoNaturalHeight;
+
+                    let renderedWidth, renderedHeight, offsetX, offsetY;
+
+                    if (canvasRatio > videoRatio) {
+                        renderedHeight = roiCanvas.height;
+                        renderedWidth = renderedHeight * videoRatio;
+                        offsetX = (roiCanvas.width - renderedWidth) / 2;
+                        offsetY = 0;
+                    } else {
+                        renderedWidth = roiCanvas.width;
+                        renderedHeight = renderedWidth / videoRatio;
+                        offsetX = 0;
+                        offsetY = (roiCanvas.height - renderedHeight) / 2;
+                    }
+
+                    const nativeXMin = Math.max(0, (xMin - offsetX) / renderedWidth) * videoNaturalWidth;
+                    const nativeXMax = Math.min(1, (xMax - offsetX) / renderedWidth) * videoNaturalWidth;
+                    const nativeYMin = Math.max(0, (yMin - offsetY) / renderedHeight) * videoNaturalHeight;
+                    const nativeYMax = Math.min(1, (yMax - offsetY) / renderedHeight) * videoNaturalHeight;
+
+                    drawnROI = {
+                        x1: Math.round(nativeXMin),
+                        x2: Math.round(nativeXMax),
+                        y1: Math.round(nativeYMin),
+                        y2: Math.round(nativeYMax)
+                    };
+
+                    // Sync textboxes 
+                    if ($('cfgRoiY1')) {
+                        $('cfgRoiY1').value = drawnROI.y1;
+                        $('cfgRoiY2').value = drawnROI.y2;
+                        $('cfgRoiX1').value = drawnROI.x1;
+                        $('cfgRoiX2').value = drawnROI.x2;
+                    }
+
+                    $('roiInstruction').innerHTML = `<span class="material-icons text-[14px] text-emerald-400">check_circle</span> Web ROI Selected: ${drawnROI.x1},${drawnROI.y1} to ${drawnROI.x2},${drawnROI.y2}`;
+                    drawCanvasRect();
+                }
+            });
+
+            roiCanvas.addEventListener('mousemove', (e) => {
+                if (clickPoints.length !== 1) return; // Only draw preview box if 1 point is clicked
+
+                const rect = roiCanvas.getBoundingClientRect();
+                const hoverX = e.clientX - rect.left;
+                const hoverY = e.clientY - rect.top;
+
+                roiCtx.clearRect(0, 0, roiCanvas.width, roiCanvas.height);
+
+                // Draw current preview box from point 1 to mouse hover
+                roiCtx.strokeStyle = '#10b981';
+                roiCtx.lineWidth = 2;
+                roiCtx.setLineDash([5, 5]);
+
+                const px1 = clickPoints[0].x;
+                const py1 = clickPoints[0].y;
+                roiCtx.strokeRect(px1, py1, hoverX - px1, hoverY - py1);
+
+                roiCtx.fillStyle = 'rgba(16, 185, 129, 0.2)';
+                roiCtx.fillRect(px1, py1, hoverX - px1, hoverY - py1);
+                roiCtx.setLineDash([]);
+
+                // Draw Point 1 Node again to keep it top-level
+                roiCtx.beginPath();
+                roiCtx.arc(px1, py1, 5, 0, 2 * Math.PI);
+                roiCtx.fillStyle = '#10b981';
+                roiCtx.fill();
+            });
+
+            // Allow cancelling with right click
+            roiCanvas.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                clickPoints = [];
+                isDrawing = false;
+                $('roiInstruction').innerHTML = `<span class="material-icons text-[14px] text-primary">touch_app</span> Cancelled. Click <b>TOP-LEFT</b> of ROI`;
+                roiCtx.clearRect(0, 0, roiCanvas.width, roiCanvas.height);
+                if (drawnROI) drawCanvasRect(); // Restore existing if any
+            });
+        }
+
+        function drawCanvasRect() {
+            if (!roiCtx || !drawnROI) return;
+            roiCtx.clearRect(0, 0, roiCanvas.width, roiCanvas.height);
+
+            // Map native ROI back to CSS rendering coordinates for display
+            const canvasRatio = roiCanvas.width / roiCanvas.height;
+            const videoRatio = videoNaturalWidth / videoNaturalHeight;
+            let renderedWidth, renderedHeight, offsetX, offsetY;
+
+            if (canvasRatio > videoRatio) {
+                renderedHeight = roiCanvas.height;
+                renderedWidth = renderedHeight * videoRatio;
+                offsetX = (roiCanvas.width - renderedWidth) / 2;
+                offsetY = 0;
+            } else {
+                renderedWidth = roiCanvas.width;
+                renderedHeight = renderedWidth / videoRatio;
+                offsetX = 0;
+                offsetY = (roiCanvas.height - renderedHeight) / 2;
+            }
+
+            const cssX1 = (drawnROI.x1 / videoNaturalWidth) * renderedWidth + offsetX;
+            const cssX2 = (drawnROI.x2 / videoNaturalWidth) * renderedWidth + offsetX;
+            const cssY1 = (drawnROI.y1 / videoNaturalHeight) * renderedHeight + offsetY;
+            const cssY2 = (drawnROI.y2 / videoNaturalHeight) * renderedHeight + offsetY;
+
+            // Draw
+            roiCtx.strokeStyle = '#10b981'; // Emerald
+            roiCtx.lineWidth = 2;
+            roiCtx.strokeRect(cssX1, cssY1, cssX2 - cssX1, cssY2 - cssY1);
+
+            // Tint outside
+            roiCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            roiCtx.fillRect(0, 0, roiCanvas.width, cssY1); // top
+            roiCtx.fillRect(0, cssY1, cssX1, cssY2 - cssY1); // left
+            roiCtx.fillRect(cssX2, cssY1, roiCanvas.width - cssX2, cssY2 - cssY1); // right
+            roiCtx.fillRect(0, cssY2, roiCanvas.width, roiCanvas.height - cssY2); // bottom
+
+            // Label
+            roiCtx.fillStyle = '#10b981';
+            roiCtx.font = "12px monospace";
+            roiCtx.fillText("Active Web ROI", cssX1 + 4, cssY1 + 14);
         }
 
         // ---- Init ----

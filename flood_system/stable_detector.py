@@ -15,7 +15,11 @@ class StableWaterDetector:
     def __init__(self, config):
         self.config = config
         self.history = deque(maxlen=30)
-        self.update_roi(config.get('roi'))
+        
+        # Load ROI properly from the 'detection' sub-dict
+        roi = config.get('detection', {}).get('roi')
+        self.update_roi(roi)
+        
         self.detector_name = "stable"
         self._is_loaded = False
 
@@ -56,6 +60,7 @@ class StableWaterDetector:
             'water_level_px': None,
             'confidence': 0.0,
             'detected': False,
+            'timestamp': time.time(),
             'raw_frame': main_frame.copy(),
             'output_frame': main_frame
         }
@@ -134,6 +139,6 @@ class StableWaterDetector:
         result['water_level_px'] = display_y
         result['confidence'] = 1.0 if water_level_cm is not None else 0.0
         result['detected'] = water_level_cm is not None
-        result['output_frame'] = main_frame
+        result['output_frame'] = main_frame.copy() if draw else main_frame
         
         return result
