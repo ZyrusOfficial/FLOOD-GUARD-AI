@@ -1,0 +1,7 @@
+nohup: ignoring input
+Traceback (most recent call last):
+  File "/home/zyrus/Documents/FLOOD_DETECT/flood_system/app.py", line 25, in <module>
+    from dashboard import Dashboard
+  File "/home/zyrus/Documents/FLOOD_DETECT/flood_system/dashboard.py", line 14, in <module>
+    from flask import Flask, render_template, Response, jsonify, request
+ModuleNotFoundError: No module named 'flask'

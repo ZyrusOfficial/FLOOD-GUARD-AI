@@ -1,0 +1,422 @@
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.crypto.CryptoComponentImpl <init>
+INFO: Default SecureRandom: SUN NativePRNG
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.crypto.CryptoComponentImpl <init>
+INFO: Installed SecureRandom: UnixPRNG SHA1PRNG
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerForShutdown
+INFO: Registering executor TimeLoggingExecutor
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerForShutdown
+INFO: Registering executor ThreadPoolExecutor
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerForShutdown
+INFO: Registering executor ScheduledThreadPoolExecutor
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerService
+INFO: Registering service KeyManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerOpenDatabaseHook
+INFO: Registering open database hook IdentityManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerForShutdown
+INFO: Registering executor TimeLoggingExecutor
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerService
+INFO: Registering service ValidationManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerOpenDatabaseHook
+INFO: Registering open database hook ClientVersioningManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerService
+INFO: Registering service ClientVersioningManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerOpenDatabaseHook
+INFO: Registering open database hook TransportPropertyManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerService
+INFO: Registering service PluginManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerService
+INFO: Registering service RendezvousPollerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerOpenDatabaseHook
+INFO: Registering open database hook AvatarManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerOpenDatabaseHook
+INFO: Registering open database hook BlogManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerOpenDatabaseHook
+INFO: Registering open database hook FeedManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerOpenDatabaseHook
+INFO: Registering open database hook GroupInvitationManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerOpenDatabaseHook
+INFO: Registering open database hook MessagingManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerOpenDatabaseHook
+INFO: Registering open database hook ForumSharingManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerOpenDatabaseHook
+INFO: Registering open database hook BlogSharingManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl registerOpenDatabaseHook
+INFO: Registering open database hook IntroductionManagerImpl
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.account.AccountManagerImpl readDbKeyFromFile
+INFO: Key file does not exist
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.account.AccountManagerImpl loadEncryptedDatabaseKey
+INFO: No database key in primary file
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.account.AccountManagerImpl readDbKeyFromFile
+INFO: Key file does not exist
+Mar 01, 2026 10:38:28 PM org.briarproject.bramble.account.AccountManagerImpl loadEncryptedDatabaseKey
+INFO: No database key in backup file
+No account found. Let's create one!
+
+
+Nickname: Password: Repeat for confirmation: Mar 01, 2026 10:38:28 PM org.briarproject.bramble.identity.IdentityManagerImpl registerIdentity
+INFO: Identity registered
+Mar 01, 2026 10:38:30 PM org.briarproject.bramble.crypto.ScryptKdf chooseCostParameter
+INFO: KDF cost parameter 262144
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.account.AccountManagerImpl storeEncryptedDatabaseKey
+INFO: Storing database key in file
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.account.AccountManagerImpl storeEncryptedDatabaseKey
+INFO: Created database key directory
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.account.AccountManagerImpl storeEncryptedDatabaseKey
+INFO: Stored database key in backup file
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.account.AccountManagerImpl storeEncryptedDatabaseKey
+INFO: Renamed backup file to primary
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.account.AccountManagerImpl storeEncryptedDatabaseKey
+INFO: Stored second copy of database key in backup file
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl startServices
+INFO: Opening database
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.db.H2Database open
+INFO: Contents of account directory before opening DB:
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.util.LogUtils logWithType
+INFO: D /home/zyrus/.briar 4096
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.util.LogUtils logWithType
+INFO: F /home/zyrus/.briar/auth_token 44
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.util.LogUtils logWithType
+INFO: D /home/zyrus/.briar/key 4096
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.util.LogUtils logWithType
+INFO: F /home/zyrus/.briar/key/db.key 218
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.util.LogUtils logWithType
+INFO: F /home/zyrus/.briar/key/db.key.bak 218
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.db.H2Database open
+INFO: Reopening DB: false
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.db.H2Database open
+INFO: Created database directory
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.db.H2Database open
+INFO: Contents of account directory after opening DB:
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.util.LogUtils logWithType
+INFO: D /home/zyrus/.briar 4096
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.util.LogUtils logWithType
+INFO: D /home/zyrus/.briar/db 4096
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.util.LogUtils logWithType
+INFO: F /home/zyrus/.briar/db/db.mv.db 516096
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.util.LogUtils logWithType
+INFO: F /home/zyrus/.briar/auth_token 44
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.util.LogUtils logWithType
+INFO: D /home/zyrus/.briar/key 4096
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.util.LogUtils logWithType
+INFO: F /home/zyrus/.briar/key/db.key 218
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.util.LogUtils logWithType
+INFO: F /home/zyrus/.briar/key/db.key.bak 218
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.identity.IdentityManagerImpl onDatabaseOpened
+INFO: Identity stored
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.lifecycle.LifecycleManagerImpl startServices
+INFO: Starting services
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.PluginManagerImpl startService
+INFO: Starting simplex plugins
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.PluginManagerImpl startService
+INFO: Starting duplex plugins
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.UnixTorPluginFactory createPlugin
+INFO: System's os.arch is amd64
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.UnixTorPluginFactory createPlugin
+INFO: The selected architecture for Tor is linux-x86_64
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin installTorExecutable
+INFO: Installing Tor binary for linux-x86_64
+[main] INFO org.eclipse.jetty.util.log - Logging initialized @2959ms to org.eclipse.jetty.util.log.Slf4jLog
+[main] INFO io.javalin.Javalin - Starting Javalin ...
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin installObfs4Executable
+INFO: Installing obfs4proxy binary for linux-x86_64
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin start
+INFO: Starting Tor
+[main] INFO io.javalin.Javalin - Listening on http://localhost:7000/
+[main] INFO io.javalin.Javalin - Javalin started in 87ms \o/
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin start
+INFO: Mar 01 22:38:31.456 [notice] Tor 0.3.5.13 (git-fc4d5077482bf4c8) running on Linux with Libevent 2.1.8-stable, OpenSSL 1.0.2u, Zlib 1.2.11, Liblzma N/A, and Libzstd N/A.
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin start
+INFO: Mar 01 22:38:31.456 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://www.torproject.org/download/download#warning
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin start
+INFO: Mar 01 22:38:31.456 [notice] Read configuration file "/home/zyrus/.briar/tor/torrc".
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin start
+INFO: Mar 01 22:38:31.457 [notice] Opening Control listener on 127.0.0.1:59051
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin start
+INFO: Mar 01 22:38:31.457 [notice] Opened Control listener on 127.0.0.1:59051
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin start
+INFO: Mar 01 22:38:31.457 [notice] DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections.
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin start
+INFO: Auth cookie created
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.system.JavaLocationUtils getCurrentCountry
+INFO: Using user-defined locale
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Online: true, wifi: false, IPv6 only: false
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Country code: US
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Charging: false
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Enabling network
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Not using bridges
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Disabling connection padding
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.PluginManagerImpl$Callback pluginStateChanged
+INFO: org.briarproject.bramble.tor changed from state STARTING_STOPPING to ENABLING
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin eventOccurred
+INFO: Tor settings updated
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin publishV3HiddenService
+INFO: Creating v3 hidden service
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin publishV3HiddenService
+INFO: V3 hidden service ova[scrubbed]
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin eventOccurred
+INFO: Tor settings updated
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Opening Socks listener on 127.0.0.1:59050 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.PluginManagerImpl$Callback pluginStateChanged
+INFO: org.briarproject.bramble.tor changed from state ENABLING to INACTIVE
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Opened Socks listener on 127.0.0.1:59050 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Bootstrapped 5%: Connecting to directory server 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin orConnStatus
+INFO: OR connection LAUNCHED $204DFD2A2C6A0DC1FA0EACB495218E0B661704FD
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Closing no-longer-configured Socks listener on 127.0.0.1:59050 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.system.JavaLocationUtils getCurrentCountry
+INFO: Using user-defined locale
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Online: true, wifi: false, IPv6 only: false
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Country code: US
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Charging: false
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Enabling network
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Not using bridges
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Disabling connection padding
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.PluginManagerImpl$Callback pluginStateChanged
+INFO: org.briarproject.bramble.tor changed from state INACTIVE to ENABLING
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Opening Socks listener on 127.0.0.1:59050 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.PluginManagerImpl$Callback pluginStateChanged
+INFO: org.briarproject.bramble.tor changed from state ENABLING to INACTIVE
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Opened Socks listener on 127.0.0.1:59050 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Closing no-longer-configured Socks listener on 127.0.0.1:59050 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.system.JavaLocationUtils getCurrentCountry
+INFO: Using user-defined locale
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Online: true, wifi: false, IPv6 only: false
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Country code: US
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Charging: false
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Enabling network
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Not using bridges
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin lambda$updateConnectionStatus$5
+INFO: Disabling connection padding
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE DisableNetwork is set. Tor will not make or accept non-control network connections. Shutting down all existing connections. 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.PluginManagerImpl$Callback pluginStateChanged
+INFO: org.briarproject.bramble.tor changed from state INACTIVE to ENABLING
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Opening Socks listener on 127.0.0.1:59050 
+Mar 01, 2026 10:38:31 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Opened Socks listener on 127.0.0.1:59050 
+Mar 01, 2026 10:38:32 PM org.briarproject.bramble.plugin.tor.TorPlugin orConnStatus
+INFO: OR connection LAUNCHED $A9406A006D6E7B5DA30F2C6D4E42A338B5E340B2
+Mar 01, 2026 10:38:34 PM org.briarproject.bramble.plugin.tor.TorPlugin orConnStatus
+INFO: OR connection LAUNCHED $B143D439B72D239A419F8DCE07B8A8EB1B486FA7
+Mar 01, 2026 10:38:35 PM org.briarproject.bramble.plugin.tor.TorPlugin orConnStatus
+INFO: OR connection LAUNCHED $A53C46F5B157DD83366D45A8E99A244934A14C46
+Mar 01, 2026 10:38:35 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Bootstrapped 10%: Finishing handshake with directory server 
+Mar 01, 2026 10:38:36 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Bootstrapped 15%: Establishing an encrypted directory connection 
+Mar 01, 2026 10:38:36 PM org.briarproject.bramble.plugin.tor.TorPlugin orConnStatus
+INFO: OR connection CONNECTED $A53C46F5B157DD83366D45A8E99A244934A14C46
+Mar 01, 2026 10:38:36 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Bootstrapped 20%: Asking for networkstatus consensus 
+Mar 01, 2026 10:38:36 PM org.briarproject.bramble.plugin.tor.TorPlugin circuitStatus
+INFO: First circuit built
+Mar 01, 2026 10:38:37 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Bootstrapped 25%: Loading networkstatus consensus 
+Mar 01, 2026 10:38:38 PM org.briarproject.bramble.plugin.tor.TorPlugin orConnStatus
+INFO: OR connection LAUNCHED $4623A9EC53BFD83155929E56D6F7B55B5E718C24
+Mar 01, 2026 10:38:38 PM org.briarproject.bramble.plugin.tor.TorPlugin orConnStatus
+INFO: OR connection LAUNCHED $F2044413DAC2E02E3D6BCF4735A19BCA1DE97281
+Mar 01, 2026 10:38:40 PM org.briarproject.bramble.plugin.tor.TorPlugin orConnStatus
+INFO: OR connection CONNECTED $F2044413DAC2E02E3D6BCF4735A19BCA1DE97281
+Mar 01, 2026 10:38:44 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE I learned some more directory information, but not enough to build a circuit: We have no usable consensus. 
+Mar 01, 2026 10:38:45 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: NOTICE Bootstrapped 40%: Loading authority key certs 
+Mar 01, 2026 10:38:46 PM org.briarproject.bramble.plugin.tor.TorPlugin message
+INFO: ERR At least one protocol listed as required in the consensus is not supported by this version of Tor. You should upgrade. This version of Tor will not work as a client on the Tor network. The missing protocols are: FlowCtrl=1 
+[qtp254918854-49] WARN io.javalin.Javalin - Uncaught exception
+java.lang.IllegalArgumentException
+	at org.briarproject.bramble.db.DatabaseComponentImpl.addLocalMessage(DatabaseComponentImpl.java:279)
+	at org.briarproject.bramble.client.ClientHelperImpl.addLocalMessage(ClientHelperImpl.java:96)
+	at org.briarproject.briar.blog.BlogManagerImpl.addLocalPost(BlogManagerImpl.java:237)
+	at org.briarproject.briar.headless.blogs.BlogControllerImpl$createPost$header$1.call(BlogControllerImpl.kt:53)
+	at org.briarproject.briar.headless.blogs.BlogControllerImpl$createPost$header$1.call(BlogControllerImpl.kt:22)
+	at org.briarproject.bramble.db.DatabaseComponentImpl.transactionWithResult(DatabaseComponentImpl.java:210)
+	at org.briarproject.briar.headless.blogs.BlogControllerImpl.createPost(BlogControllerImpl.kt:52)
+	at org.briarproject.briar.headless.Router$start$2$1$6$1$2.handle(Router.kt:105)
+	at org.briarproject.briar.headless.Router$start$accessManager$1.manage(Router.kt:52)
+	at io.javalin.http.JavalinServlet$addHandler$protectedHandler$1.handle(JavalinServlet.kt:116)
+	at io.javalin.http.JavalinServlet$service$2$1.invoke(JavalinServlet.kt:45)
+	at io.javalin.http.JavalinServlet$service$2$1.invoke(JavalinServlet.kt:24)
+	at io.javalin.http.JavalinServlet$service$1.invoke(JavalinServlet.kt:123)
+	at io.javalin.http.JavalinServlet$service$2.invoke(JavalinServlet.kt:40)
+	at io.javalin.http.JavalinServlet.service(JavalinServlet.kt:75)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:790)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:852)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:544)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:233)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1581)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:233)
+	at io.javalin.core.JavalinServer$start$httpHandler$1.doHandle(JavalinServer.kt:53)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:188)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:482)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1549)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:186)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1204)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:141)
+	at org.eclipse.jetty.server.handler.HandlerList.handle(HandlerList.java:59)
+	at org.eclipse.jetty.server.handler.StatisticsHandler.handle(StatisticsHandler.java:173)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:127)
+	at org.eclipse.jetty.server.Server.handle(Server.java:494)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:374)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:268)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:311)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:103)
+	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:117)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:336)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:313)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:171)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:129)
+	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:367)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:782)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:918)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Mar 01, 2026 11:04:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl addPendingContact
+INFO: Starting poller
+Mar 01, 2026 11:05:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:06:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:07:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:08:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:09:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:10:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:11:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:12:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:13:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:14:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:15:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:16:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:17:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:18:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:19:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:20:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:21:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:22:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:23:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:24:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:25:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:26:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:27:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:28:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:29:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:30:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:31:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:32:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:33:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:34:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:35:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:36:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:37:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:38:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:39:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:40:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:41:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:42:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:43:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:44:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:45:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:46:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:47:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:48:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:49:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:50:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:51:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling
+Mar 01, 2026 11:52:26 PM org.briarproject.bramble.rendezvous.RendezvousPollerImpl poll
+INFO: Polling

@@ -393,8 +393,8 @@
                         <span class="text-[10px]">BLE</span>
                     </div>
                     <div id="chChat" class="flex items-center gap-1 text-slate-300 dark:text-slate-600">
-                        <span class="material-icons text-[14px]">chat</span>
-                        <span class="text-[10px]">CHAT</span>
+                        <span class="material-icons text-[14px]">lock</span>
+                        <span class="text-[10px]">BRIAR</span>
                     </div>
                     <div id="chTelegram" class="flex items-center gap-1 text-slate-300 dark:text-slate-600">
                         <span class="material-icons text-[14px]">send</span>
@@ -974,7 +974,7 @@
                             <div class="col-span-6 md:col-span-8 flex items-center gap-3 pl-2">
                                 <span class="material-icons text-primary">volume_up</span>
                                 <div>
-                                    <p class="text-sm font-bold text-slate-900 dark:text-white">Audible Siren</p>
+                                    <p class="text-sm font-bold text-slate-900 dark:text-white">Audible Buzzer</p>
                                     <p class="text-[10px] text-slate-500">Play sound during alerts</p>
                                 </div>
                             </div>
@@ -982,6 +982,7 @@
                                 <label class="relative inline-flex items-center cursor-pointer">
                                     <input type="checkbox" id="cfgSirenEnabled" class="sr-only peer"
                                         onchange="siren.setEnabled(this.checked)">
+
                                     <div
                                         class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary dark:bg-slate-700 dark:border-slate-600">
                                     </div>
@@ -1168,14 +1169,15 @@
         let chartData = [];
         let currentLevel = 0;
 
-        // Siren Manager (Web Audio API)
-        class SirenManager {
+        // Buzzer Manager (Web Audio API)
+        class BuzzerManager {
             constructor() {
                 this.ctx = null;
                 this.osc = null;
                 this.gain = null;
                 this.active = false;
-                this.enabled = localStorage.getItem('sirenEnabled') === 'true';
+                this.enabled = localStorage.getItem('sirenEnabled') !== 'false'; // Default to true
+
             }
 
             start() {
@@ -1192,20 +1194,26 @@
                     this.osc = this.ctx.createOscillator();
                     this.gain = this.ctx.createGain();
 
-                    this.osc.type = 'triangle';
-                    this.osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+                    // Beep effect for buzzer
+                    this.osc.type = 'square';
+                    this.osc.frequency.setValueAtTime(880, this.ctx.currentTime); // Higher pitch for buzzer
 
-                    // LFO for wailing effect
+                    // Rapid beep for Critical/Danger
+                    const beepRate = currentLevel >= 3 ? 0.2 : 0.5;
                     this.lfo = this.ctx.createOscillator();
                     this.lfoGain = this.ctx.createGain();
-                    this.lfo.frequency.value = 1.0;
-                    this.lfoGain.gain.value = 150;
-
-                    this.lfo.connect(this.lfoGain);
-                    this.lfoGain.connect(this.osc.frequency);
+                    this.lfo.type = 'square';
+                    this.lfo.frequency.value = 2.0; // 2Hz beep
 
                     this.gain.gain.setValueAtTime(0, this.ctx.currentTime);
-                    this.gain.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 0.1);
+
+                    // Connect LFO to Gain for beeping
+                    this.lfo.connect(this.lfoGain);
+                    this.lfoGain.connect(this.gain.gain);
+                    this.lfoGain.gain.value = 0.3;
+
+                    this.osc.connect(this.gain);
+                    this.gain.connect(this.ctx.destination);
 
                     this.osc.connect(this.gain);
                     this.gain.connect(this.ctx.destination);
@@ -1249,7 +1257,16 @@
                 }
             }
         }
-        const siren = new SirenManager();
+        const siren = new BuzzerManager();
+
+
+        // Resume AudioContext on first interaction
+        document.addEventListener('click', () => {
+            if (siren.ctx && siren.ctx.state === 'suspended') {
+                siren.ctx.resume();
+            }
+        }, { once: true });
+
         let chartRange = 360; // minutes
         const ALERT_COLORS = {
             0: { name: 'NORMAL', color: 'emerald', icon: 'check_circle' },
@@ -1285,6 +1302,22 @@
         socket.on('alert', (data) => {
             addAlertEntry(data);
             showToast(data);
+
+            // Sync current level from alert
+            const levelMap = { 'NORMAL': 0, 'WARNING': 1, 'DANGER': 2, 'CRITICAL': 3 };
+            const level = levelMap[data.new_level] !== undefined ? levelMap[data.new_level] : 0;
+
+            if (level !== currentLevel) {
+                currentLevel = level;
+                updateTrendBadge(level);
+                updateAlertPanel(level);
+
+                if (level >= 1) {
+                    siren.start();
+                } else {
+                    siren.stop();
+                }
+            }
         });
 
         // ---- Update Water Level ----
@@ -1524,7 +1557,7 @@
                         setChannel('chWeb', ch.dashboard !== false);
                         setChannel('chSms', ch.sms === true);
                         setChannel('chBle', ch.ble === true);
-                        setChannel('chChat', ch.nostr === true);
+                        setChannel('chChat', ch.briar === true);
                         setChannel('chTelegram', ch.telegram === true);
                     }
                 })

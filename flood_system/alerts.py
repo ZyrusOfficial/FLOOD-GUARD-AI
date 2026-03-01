@@ -25,7 +25,10 @@ from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
 import asyncio
 import os
 import sys
-from bitchat_bridge import BitchatBridge
+from datetime import datetime
+
+# Local imports
+from briar_client import BriarClient
 
 try:
     import websocket as ws_client
@@ -116,8 +119,12 @@ class AlertManager:
         self._kde_device_flag = None  # e.g. '-n' or '-d'
         self._kde_device_value = None  # e.g. 'Y18' or UUID
 
-        # BitChat Bridge (Programmatic TUI-compatible)
-        self.bitchat_bridge = BitchatBridge(nickname="HYDROGUARD_NODE")
+        # Briar Client
+        briar_cfg = self.config.get('briar', {})
+        self.briar = BriarClient(
+            api_url=briar_cfg.get('api_url', 'http://localhost:8080'),
+            api_token=briar_cfg.get('api_token')
+        )
 
         # Channel status (start with defaults, update async)
         self._channel_status = {
@@ -125,7 +132,7 @@ class AlertManager:
             'sms': False,
             'ble': False,
             'nostr': True,
-            'bitchat': False,
+            'briar': False,
             'telegram': False
         }
 
@@ -273,11 +280,9 @@ class AlertManager:
                     # Nostr
                     threading.Thread(target=self._send_nostr, args=(message, level, water_level_cm), daemon=True).start()
                     
-                    # BLE
-                    threading.Thread(target=self._send_esp32, args=(level, water_level_cm, alert_id), daemon=True).start()
-
-                    if i < 2: # No wait after last message
-                        time.sleep(5)
+                    # Briar
+                    if self.config.get('briar', {}).get('enabled', True):
+                        threading.Thread(target=self.briar.send_alert, args=(message,), daemon=True).start()
             finally:
                 with self._burst_lock:
                     self._is_bursting = False
@@ -385,6 +390,27 @@ class AlertManager:
         for cid in self._telegram_registered_chats:
             threading.Thread(target=post_telegram, args=(cid,), daemon=True).start()
 
+    def _briar_status_loop(self):
+        """Periodically check Briar connection and sync forum."""
+        while True:
+            try:
+                if self.briar.check_connection():
+                    if not self._channel_status['briar']:
+                        logger.info("Briar Headless REST API connected")
+                    self._channel_status['briar'] = True
+                    # Periodically sync forum ID if missing
+                    if not self.briar._forum_id:
+                        self.briar.sync_forum()
+                else:
+                    if self._channel_status['briar']:
+                        logger.warning("Briar Headless REST API disconnected")
+                    self._channel_status['briar'] = False
+            except Exception as e:
+                logger.debug(f"Briar status check failed: {e}")
+                self._channel_status['briar'] = False
+            
+            time.sleep(30) # Check every 30 seconds
+
     def _telegram_poll_loop(self):
         """Poll for /start or /register commands to capture chat IDs."""
         token = self.config.get('telegram', {}).get('token')
@@ -482,9 +508,9 @@ class AlertManager:
         if self.config['esp32']['enabled']:
             self._connect_esp32()
 
-        # Start BitChat Bridge
-        self.bitchat_bridge.start()
-        self._channel_status['bitchat'] = True
+        # Start Briar Status Loop
+        if self.config.get('briar', {}).get('enabled', True):
+            threading.Thread(target=self._briar_status_loop, daemon=True).start()
 
         # Initial Telegram check
         if self.config.get('telegram', {}).get('enabled', False):

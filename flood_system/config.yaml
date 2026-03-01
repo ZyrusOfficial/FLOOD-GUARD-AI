@@ -10,11 +10,11 @@ alerts:
     critical: 290
     danger: 260
     warning: 150
-bitchat:
-  channel: '#alerts'
-  cooldown: 60
+briar:
   enabled: true
-  nickname: HYDROGUARD_NODE
+  api_url: "http://localhost:7000"
+  api_token: "awKMAuJBv+DVPg8OHaJNOWDZLQzdkLCxWUwH9cru7b4="
+  forum_name: "Flood Alerts"
 camera:
   droidcam_ip: 192.168.1.175
   droidcam_port: 4747
