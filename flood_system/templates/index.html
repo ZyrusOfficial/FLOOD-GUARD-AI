@@ -967,6 +967,27 @@
                                 </label>
                             </div>
                         </div>
+
+                        <!-- Audible Siren Toggle -->
+                        <div
+                            class="grid grid-cols-12 gap-2 p-4 items-center hover:bg-slate-50/50 dark:hover:bg-[#111318]/50 transition-colors border-t border-slate-200 dark:border-slate-800">
+                            <div class="col-span-6 md:col-span-8 flex items-center gap-3 pl-2">
+                                <span class="material-icons text-primary">volume_up</span>
+                                <div>
+                                    <p class="text-sm font-bold text-slate-900 dark:text-white">Audible Siren</p>
+                                    <p class="text-[10px] text-slate-500">Play sound during alerts</p>
+                                </div>
+                            </div>
+                            <div class="col-span-6 md:col-span-4 flex justify-center">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="cfgSirenEnabled" class="sr-only peer"
+                                        onchange="siren.setEnabled(this.checked)">
+                                    <div
+                                        class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary dark:bg-slate-700 dark:border-slate-600">
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <p class="text-[10px] text-slate-500 mt-3 pl-1 font-medium"><span class="text-red-500">*</span>
                         Critical alerts are mandatory and forced to send SMS.</p>
@@ -1146,6 +1167,89 @@
         // ---- State ----
         let chartData = [];
         let currentLevel = 0;
+
+        // Siren Manager (Web Audio API)
+        class SirenManager {
+            constructor() {
+                this.ctx = null;
+                this.osc = null;
+                this.gain = null;
+                this.active = false;
+                this.enabled = localStorage.getItem('sirenEnabled') === 'true';
+            }
+
+            start() {
+                if (!this.enabled || this.active) return;
+
+                try {
+                    if (!this.ctx) {
+                        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                    if (this.ctx.state === 'suspended') {
+                        this.ctx.resume();
+                    }
+
+                    this.osc = this.ctx.createOscillator();
+                    this.gain = this.ctx.createGain();
+
+                    this.osc.type = 'triangle';
+                    this.osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+
+                    // LFO for wailing effect
+                    this.lfo = this.ctx.createOscillator();
+                    this.lfoGain = this.ctx.createGain();
+                    this.lfo.frequency.value = 1.0;
+                    this.lfoGain.gain.value = 150;
+
+                    this.lfo.connect(this.lfoGain);
+                    this.lfoGain.connect(this.osc.frequency);
+
+                    this.gain.gain.setValueAtTime(0, this.ctx.currentTime);
+                    this.gain.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 0.1);
+
+                    this.osc.connect(this.gain);
+                    this.gain.connect(this.ctx.destination);
+
+                    this.osc.start();
+                    this.lfo.start();
+                    this.active = true;
+                } catch (e) {
+                    console.error("Audio error:", e);
+                }
+            }
+
+            stop() {
+                if (!this.active) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    this.gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                    setTimeout(() => {
+                        if (this.osc) {
+                            this.osc.stop();
+                            this.lfo.stop();
+                            this.osc.disconnect();
+                            this.lfo.disconnect();
+                        }
+                        this.active = false;
+                    }, 600);
+                } catch (e) {
+                    this.active = false;
+                }
+            }
+
+            setEnabled(val) {
+                this.enabled = val;
+                localStorage.setItem('sirenEnabled', val);
+                if (!val) this.stop();
+                else if (currentLevel >= 1) this.start();
+
+                // Resume context on user interaction
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+        }
+        const siren = new SirenManager();
         let chartRange = 360; // minutes
         const ALERT_COLORS = {
             0: { name: 'NORMAL', color: 'emerald', icon: 'check_circle' },
@@ -1224,6 +1328,13 @@
             if (level !== currentLevel) {
                 currentLevel = level;
                 updateAlertPanel(level);
+
+                // Sound logic (Warning, Danger, Critical)
+                if (level >= 1) {
+                    siren.start();
+                } else {
+                    siren.stop();
+                }
             }
         }
 
@@ -1620,6 +1731,11 @@
             const modal = $('settingsModal');
             const content = $('settingsModalContent');
             modal.classList.remove('hidden');
+
+            // Siren state
+            if ($('cfgSirenEnabled')) {
+                $('cfgSirenEnabled').checked = siren.enabled;
+            }
 
             fetch('/api/settings').then(r => r.json()).then(data => {
                 $('cfgDeviceId').value = data.sms_device_id || '';
