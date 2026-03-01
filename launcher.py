@@ -137,9 +137,10 @@ class HydroGuardLauncher(ctk.CTk):
             self.log("[x] Virtual Environment not active! Scripts may fail.")
             
         # 2. Check config.yaml
-        if os.path.exists("config.yaml"):
+        config_path = "flood_system/config.yaml"
+        if os.path.exists(config_path):
             try:
-                with open("config.yaml", "r") as f:
+                with open(config_path, "r") as f:
                     yaml.safe_load(f)
                 self.lbl_config.configure(text="Config: OK", text_color="green")
                 self.log("[✓] config.yaml validated")

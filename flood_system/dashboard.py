@@ -168,6 +168,25 @@ class Dashboard:
             logger.info("Settings updated and saved to config.yaml")
             return jsonify({'status': 'success'})
 
+        @self.app.route('/api/telegram', methods=['GET'])
+        def get_telegram():
+            return jsonify({
+                'token': self.config['telegram'].get('token', ''),
+                'chat_id': self.config['telegram'].get('chat_id', ''),
+                'enabled': self.config['telegram'].get('enabled', False)
+            })
+
+        @self.app.route('/api/telegram', methods=['POST'])
+        def update_telegram():
+            data = request.get_json()
+            if 'token' in data:
+                self.config['telegram']['token'] = data['token']
+            if 'enabled' in data:
+                self.config['telegram']['enabled'] = data['enabled']
+            
+            self._save_config()
+            return jsonify({'status': 'success'})
+
 
         @self.app.route('/api/test_alert', methods=['POST'])
         def test_alert():

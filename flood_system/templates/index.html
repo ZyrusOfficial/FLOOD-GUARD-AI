@@ -396,6 +396,10 @@
                         <span class="material-icons text-[14px]">chat</span>
                         <span class="text-[10px]">CHAT</span>
                     </div>
+                    <div id="chTelegram" class="flex items-center gap-1 text-slate-300 dark:text-slate-600">
+                        <span class="material-icons text-[14px]">send</span>
+                        <span class="text-[10px]">TG</span>
+                    </div>
                 </div>
                 <div id="uptimeDisplay" class="text-[10px] text-slate-400 font-mono">
                     UP: --
@@ -470,6 +474,11 @@
                             <span class="material-icons text-[20px]">sms</span>
                             <span class="text-sm font-medium">SMS Recipients</span>
                         </button>
+                        <button onclick="switchTab('telegram')" id="tab-btn-telegram"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left group">
+                            <span class="material-icons text-[20px]">send</span>
+                            <span class="text-sm font-medium">Telegram Bot</span>
+                        </button>
                     </div>
                 </div>
                 <div class="p-4 border-t border-slate-200 dark:border-slate-800">
@@ -500,6 +509,7 @@
                             <option value="camera">Camera Calibration</option>
                             <option value="alerts">Alert Thresholds</option>
                             <option value="sms">SMS Recipients</option>
+                            <option value="telegram">Telegram Bot</option>
                         </select>
                         <button onclick="closeSettingsModal()"
                             class="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
@@ -1033,6 +1043,92 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- TAB: TELEGRAM -->
+                <div id="tab-telegram" class="settings-tab-panel flex-1 overflow-y-auto w-full h-full hidden">
+                    <div class="p-4 md:p-8 lg:p-10 max-w-5xl mx-auto">
+                        <header class="mb-8">
+                            <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">Telegram
+                                Integration</h2>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm">Configure your Telegram Bot for
+                                instant, high-priority notifications.</p>
+                        </header>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <section
+                                class="bg-white dark:bg-[#1a202c] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                                <div
+                                    class="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#111318]/50">
+                                    <h3
+                                        class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                        <span class="material-icons text-blue-500 text-[20px]">smart_toy</span> Bot
+                                        Configuration
+                                    </h3>
+                                </div>
+                                <div class="p-6 flex flex-col gap-6">
+                                    <div class="flex flex-col gap-1.5">
+                                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Bot API
+                                            Token</label>
+                                        <input id="cfgTgToken" type="password"
+                                            class="w-full bg-slate-50 dark:bg-[#111318] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white text-sm rounded-lg p-2.5 font-mono"
+                                            placeholder="123456789:ABCDefGhIjKlMnOpQrStUvWxYz">
+                                        <p class="text-[10px] text-slate-500 mt-1 italic">Obtain this from @BotFather on
+                                            Telegram.</p>
+                                    </div>
+                                    <div class="flex flex-col gap-1.5">
+                                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Current Chat
+                                            ID</label>
+                                        <div class="flex gap-2">
+                                            <input id="cfgTgChatId" type="text" readonly
+                                                class="flex-1 bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-500 text-sm rounded-lg p-2.5 font-mono cursor-not-allowed"
+                                                placeholder="Waiting for registration...">
+                                            <div id="tgStatusBadge"
+                                                class="px-2 py-0.5 rounded flex items-center justify-center bg-slate-100 text-slate-400 text-[10px] font-bold">
+                                                INACTIVE</div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex justify-end">
+                                        <button onclick="saveTgSettings()"
+                                            class="bg-primary hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-primary/20 flex items-center gap-2">
+                                            <span class="material-icons text-[18px]">save</span> Update Token
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section
+                                class="bg-white dark:bg-[#1a202c] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm h-fit">
+                                <div
+                                    class="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-[#111318]/50">
+                                    <h3
+                                        class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                        <span
+                                            class="material-icons text-emerald-500 text-[20px]">app_registration</span>
+                                        Registration Guide
+                                    </h3>
+                                </div>
+                                <div class="p-6">
+                                    <ol class="space-y-4 text-xs text-slate-600 dark:text-slate-400 list-decimal pl-4">
+                                        <li>Message your bot on Telegram.</li>
+                                        <li>Send the command <code
+                                                class="bg-primary/10 text-primary px-1.5 py-0.5 rounded font-mono font-bold">/register</code>.
+                                        </li>
+                                        <li>The system will automatically detect your Chat ID.</li>
+                                        <li>You will receive a confirmation message.</li>
+                                    </ol>
+                                    <div
+                                        class="mt-6 p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20 flex gap-3 items-start">
+                                        <span class="material-icons text-emerald-500">info</span>
+                                        <p class="text-[11px] leading-relaxed text-emerald-700 dark:text-emerald-400">
+                                            <b>Auto-Registration:</b> You don't need to manually enter the Chat ID. Just
+                                            send /register to your bot and this screen will update automatically.
+                                        </p>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -1318,6 +1414,7 @@
                         setChannel('chSms', ch.sms === true);
                         setChannel('chBle', ch.ble === true);
                         setChannel('chChat', ch.nostr === true);
+                        setChannel('chTelegram', ch.telegram === true);
                     }
                 })
                 .catch(() => { });
@@ -1499,6 +1596,20 @@
             });
         }
 
+        function saveTgSettings() {
+            const payload = {
+                token: $('cfgTgToken').value,
+                enabled: true
+            };
+            fetch('/api/telegram', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(r => r.json()).then(() => {
+                showToast({ new_level: 'NORMAL', message: 'Telegram Token updated. Polling started.' });
+            });
+        }
+
         // OVERRIDE old saveSettings to avoid confusion
         function saveSettings() {
             console.log("Use specific save functions instead.");
@@ -1513,6 +1624,11 @@
             fetch('/api/settings').then(r => r.json()).then(data => {
                 $('cfgDeviceId').value = data.sms_device_id || '';
                 $('cfgRecipients').value = data.sms_recipients || '';
+            });
+
+            fetch('/api/telegram').then(r => r.json()).then(data => {
+                $('cfgTgToken').value = data.token || '';
+                updateTgStatus(data);
             });
 
             fetch('/api/config').then(r => r.json()).then(data => {
@@ -1551,6 +1667,7 @@
             $('cfgDroidCamPort').addEventListener('input', (e) => $('previewPort').innerText = e.target.value);
 
             // ROI manual listeners
+
             ['cfgRoiY1', 'cfgRoiY2', 'cfgRoiX1', 'cfgRoiX2'].forEach(id => {
                 $(id).addEventListener('input', () => {
                     drawnROI = {
@@ -1577,6 +1694,31 @@
 
             switchTab('system'); // default tab
         }
+
+        function updateTgStatus(data) {
+            const idInput = $('cfgTgChatId');
+            const badge = $('tgStatusBadge');
+
+            if (data.chat_id) {
+                idInput.value = data.chat_id;
+                badge.innerText = "ACTIVE";
+                badge.className = "px-2 py-0.5 rounded flex items-center justify-center bg-emerald-500 text-white text-[10px] font-bold";
+            } else {
+                idInput.value = "";
+                badge.innerText = "WAITING...";
+                badge.className = "px-2 py-0.5 rounded flex items-center justify-center bg-orange-500 text-white text-[10px] font-bold animate-pulse";
+            }
+        }
+
+        // Periodically poll for registration when on telegram tab
+        setInterval(() => {
+            const tgTab = $('tab-telegram');
+            if (tgTab && !tgTab.classList.contains('hidden')) {
+                fetch('/api/telegram').then(r => r.json()).then(data => {
+                    updateTgStatus(data);
+                });
+            }
+        }, 5000);
 
         // ---- Model Selection ---
         let _activeModel = 'canny';

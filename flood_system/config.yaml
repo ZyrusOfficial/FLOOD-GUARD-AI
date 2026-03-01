@@ -4,16 +4,22 @@ alerts:
     dashboard: 10
     nostr: 120
     sms: 300
+    telegram: 300
   hysteresis: 5
   thresholds:
     critical: 290
     danger: 260
     warning: 150
+bitchat:
+  channel: '#alerts'
+  cooldown: 60
+  enabled: true
+  nickname: HYDROGUARD_NODE
 camera:
   droidcam_ip: 192.168.1.175
   droidcam_port: 4747
   fallback_webcam: 0
-  max_fps: 15
+  max_fps: 30
   reconnect_delay: 3
   stream_url: http://192.168.1.175:4747/video
 dashboard:
@@ -35,10 +41,10 @@ detection:
   hough_rho: 1
   hough_threshold: 15
   roi:
-  - 149
-  - 381
-  - 451
-  - 673
+  - 203
+  - 523
+  - 775
+  - 1020
   smoothing_window: 5
   water_level_offset: 150
   yolo:
@@ -57,12 +63,22 @@ esp32:
   enabled: true
   port: /dev/ttyUSB0
 nostr:
+  admin_npub: npub1k8rstk494pqjy4wsr9xj45a3r4dfwkvmgwhle348705u5pyxxh6qwf7xuz
+  geohash: wdtz2n4
   private_key: ce7ba6f25e2f59b709c3103b4754aaac1547503ca5e28b5fb6b5113b06c1a118
   relays:
   - wss://relay.damus.io
-  - wss://relay.nostr.band
   - wss://nos.lol
+  - wss://nostr-relay.zeabur.app
+  - wss://relay.0xchat.com
+  - wss://relay.ru.ac.th
+  - wss://relay.notoshi.win
+  - wss://nostr-01.yakihonne.com
 sms:
   device_id: Y18
   recipients:
-  - '+639123456789'
+  - 09763079509
+telegram:
+  chat_id: '8283642133'
+  enabled: true
+  token: 8628224553:AAEPOtbR_sFiNy1xgpUcaucGQQSJCHCM-ZY

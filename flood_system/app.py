@@ -71,7 +71,7 @@ class FloodWarningSystem:
             self.detector = self.canny_detector
 
         logger.info("Initializing alert manager...")
-        self.alert_manager = AlertManager(self.config)
+        self.alert_manager = AlertManager(self.config, config_path=self.config_path)
 
         logger.info("Initializing web dashboard...")
         self.dashboard = Dashboard(

@@ -16,9 +16,16 @@ import threading
 import time
 import json
 import uuid
-import hashlib
 import secrets
 import logging
+import requests
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
+import asyncio
+import os
+import sys
+from bitchat_bridge import BitchatBridge
 
 try:
     import websocket as ws_client
@@ -52,8 +59,9 @@ LEVEL_COLORS = {
 class AlertManager:
     """Manages flood alert state and dispatches alerts through all channels."""
 
-    def __init__(self, config, socketio=None):
+    def __init__(self, config, config_path=None, socketio=None):
         self.config = config
+        self.config_path = config_path
         self.socketio = socketio
 
         # Thresholds
@@ -68,10 +76,12 @@ class AlertManager:
         # Cooldowns
         cooldowns = config['alerts']['cooldown']
         self.cooldowns = {
-            'sms': cooldowns['sms'],
-            'nostr': cooldowns['nostr'],
-            'ble': cooldowns['ble'],
-            'dashboard': cooldowns['dashboard']
+            'sms': cooldowns.get('sms', 300),
+            'nostr': cooldowns.get('nostr', 120),
+            'ble': cooldowns.get('ble', 30),
+            'dashboard': cooldowns.get('dashboard', 10),
+            'telegram': cooldowns.get('telegram', 300),
+            'bitchat': config.get('bitchat', {}).get('cooldown', 60)
         }
 
         # State
@@ -80,10 +90,23 @@ class AlertManager:
             'sms': 0,
             'nostr': 0,
             'ble': 0,
-            'dashboard': 0
+            'dashboard': 0,
+            'telegram': 0,
+            'bitchat': 0
+        }
+        self._last_alert_level = {
+            'sms': 0,
+            'nostr': 0,
+            'ble': 0,
+            'dashboard': 0,
+            'telegram': 0,
+            'bitchat': 0
         }
         self._alert_history = []
         self._lock = threading.Lock()
+        self._last_dispatched_cm = 0
+        self._burst_lock = threading.Lock()
+        self._is_bursting = False
 
         # ESP32 serial connection
         self._serial = None
@@ -93,13 +116,30 @@ class AlertManager:
         self._kde_device_flag = None  # e.g. '-n' or '-d'
         self._kde_device_value = None  # e.g. 'Y18' or UUID
 
+        # BitChat Bridge (Programmatic TUI-compatible)
+        self.bitchat_bridge = BitchatBridge(nickname="HYDROGUARD_NODE")
+
         # Channel status (start with defaults, update async)
         self._channel_status = {
             'dashboard': True,
             'sms': False,
             'ble': False,
-            'nostr': True
+            'nostr': True,
+            'bitchat': False,
+            'telegram': False
         }
+
+        self._telegram_registered_chats = set()
+        tg_chats = self.config.get('telegram', {}).get('chat_id', '')
+        if tg_chats:
+            # Handle both single string and comma-separated string
+            for cid in str(tg_chats).split(','):
+                if cid.strip():
+                    self._telegram_registered_chats.add(cid.strip())
+
+        # BitChat Initializations (Bridge manages its own threads)
+        self._bitchat_loop = None
+        self._bitchat_client = None
 
         # Connect to peripherals in background (non-blocking startup)
         threading.Thread(target=self._init_channels, daemon=True).start()
@@ -150,16 +190,25 @@ class AlertManager:
                 if water_level_cm > (current_threshold - self.hysteresis):
                     new_level = self._current_level  # Stay at current level
 
-            # Level changed — trigger alerts
-            if new_level != self._current_level:
+            # Level changed OR significant (5%) level change in alert state
+            level_changed = (new_level != self._current_level)
+            
+            # 5% change threshold (relative to calibration max)
+            top_cm = self.config.get('detection', {}).get('calibration', {}).get('top_cm', 200)
+            threshold = top_cm * 0.05
+            significant_change = abs(water_level_cm - self._last_dispatched_cm) >= threshold
+
+            if level_changed or (new_level > NORMAL and significant_change):
                 old_level = self._current_level
                 self._current_level = new_level
+                self._last_dispatched_cm = water_level_cm
+                
+                # Reset tracking at NORMAL
+                if new_level == NORMAL:
+                    self._last_dispatched_cm = 0
+                
                 self._on_level_change(old_level, new_level, water_level_cm)
-
-            # Periodic re-alert for ongoing conditions
-            elif new_level > NORMAL:
-                self._periodic_alert(new_level, water_level_cm)
-
+            
             return self._current_level
 
     def _on_level_change(self, old_level, new_level, water_level_cm):
@@ -188,47 +237,52 @@ class AlertManager:
 
         # Dispatch to all channels
         if new_level > NORMAL:
-            self._dispatch_all(msg, new_level, water_level_cm, alert_entry['id'])
+            force = new_level > old_level
+            self._dispatch_all(msg, new_level, water_level_cm, alert_entry['id'], force=force)
 
         # Always notify dashboard
         self._send_dashboard_alert(alert_entry)
 
-    def _periodic_alert(self, level, water_level_cm):
-        """Send periodic re-alerts for ongoing conditions."""
-        now = time.time()
-        msg = (
-            f"ONGOING ALERT [{LEVEL_NAMES[level]}]: "
-            f"Water level at {water_level_cm:.0f} cm."
-        )
-        # Only SMS and BLE for periodic
-        if now - self._last_alert_time['sms'] > self.cooldowns['sms']:
-            self._send_sms(msg)
-        if now - self._last_alert_time['ble'] > self.cooldowns['ble']:
-            self._send_esp32(level, water_level_cm, "periodic")
+        # Reset escalation tracking when returning to NORMAL
+        if new_level == NORMAL:
+            for ch in self._last_alert_level:
+                self._last_alert_level[ch] = 0
+            logger.info("Alert level returned to NORMAL. Escalation tracking reset.")
 
-    def _dispatch_all(self, message, level, water_level_cm, alert_id):
-        """Send alert through all channels."""
-        now = time.time()
 
-        # SMS via KDE Connect
-        if now - self._last_alert_time['sms'] > self.cooldowns['sms']:
-            threading.Thread(
-                target=self._send_sms, args=(message,), daemon=True
-            ).start()
+    def _dispatch_all(self, message, level, water_level_cm, alert_id, force=False):
+        """Send alert burst through all channels."""
+        # Burst logic: 3 messages, 5 seconds apart
+        def execute_burst():
+            with self._burst_lock:
+                if self._is_bursting:
+                    return # Avoid overlapping bursts if changes are too rapid
+                self._is_bursting = True
 
-        # Nostr for Bitchat
-        if now - self._last_alert_time['nostr'] > self.cooldowns['nostr']:
-            threading.Thread(
-                target=self._send_nostr, args=(message, level, water_level_cm),
-                daemon=True
-            ).start()
+            try:
+                for i in range(3):
+                    # Dispatch to all enabled and configured channels
+                    # We bypass individual cooldowns here as the 5% rule is our new throttle
+                    
+                    # SMS
+                    threading.Thread(target=self._send_sms, args=(message,), daemon=True).start()
+                    
+                    # Telegram
+                    self._send_telegram(message)
+                    
+                    # Nostr
+                    threading.Thread(target=self._send_nostr, args=(message, level, water_level_cm), daemon=True).start()
+                    
+                    # BLE
+                    threading.Thread(target=self._send_esp32, args=(level, water_level_cm, alert_id), daemon=True).start()
 
-        # ESP32 BLE beacon
-        if now - self._last_alert_time['ble'] > self.cooldowns['ble']:
-            threading.Thread(
-                target=self._send_esp32,
-                args=(level, water_level_cm, alert_id), daemon=True
-            ).start()
+                    if i < 2: # No wait after last message
+                        time.sleep(5)
+            finally:
+                with self._burst_lock:
+                    self._is_bursting = False
+
+        threading.Thread(target=execute_burst, daemon=True).start()
 
     # ---- SMS via KDE Connect ----
 
@@ -289,6 +343,7 @@ class AlertManager:
 
             self._last_alert_time['sms'] = time.time()
             self._channel_status['sms'] = True
+            logger.debug(f"SMS channel updated: last_time={self._last_alert_time['sms']}")
 
         except FileNotFoundError:
             logger.error("kdeconnect-cli not found — install KDE Connect")
@@ -298,6 +353,111 @@ class AlertManager:
         except Exception as e:
             logger.error(f"SMS error: {e}")
             self._channel_status['sms'] = False
+
+    def _send_telegram(self, message):
+        """Send alert via Telegram Bot API to all registered chats."""
+        if not self.config.get('telegram', {}).get('enabled', False):
+            return
+
+        token = self.config['telegram']['token']
+        if not token or not self._telegram_registered_chats:
+            return
+
+        def post_telegram(target_id):
+            try:
+                url = f"https://api.telegram.org/bot{token}/sendMessage"
+                payload = {
+                    "chat_id": target_id,
+                    "text": message,
+                    "parse_mode": "HTML"
+                }
+                response = requests.post(url, json=payload, timeout=10)
+                if response.status_code == 200:
+                    logger.info(f"Telegram: Alert sent to {target_id} successfully")
+                    self._last_alert_time['telegram'] = time.time()
+                    self._channel_status['telegram'] = True
+                else:
+                    logger.error(f"Telegram error for {target_id}: {response.text}")
+            except Exception as e:
+                logger.error(f"Telegram dispatch failed for {target_id}: {e}")
+
+        # Send to all registered chats
+        for cid in self._telegram_registered_chats:
+            threading.Thread(target=post_telegram, args=(cid,), daemon=True).start()
+
+    def _telegram_poll_loop(self):
+        """Poll for /start or /register commands to capture chat IDs."""
+        token = self.config.get('telegram', {}).get('token')
+        if not token: return
+
+        last_update_id = 0
+        logger.info("Telegram: Polling for registration commands...")
+
+        while True:
+            try:
+                url = f"https://api.telegram.org/bot{token}/getUpdates"
+                params = {"offset": last_update_id + 1, "timeout": 30}
+                response = requests.get(url, params=params, timeout=35)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    for update in data.get("result", []):
+                        last_update_id = update["update_id"]
+                        message = update.get("message", {})
+                        text = message.get("text", "")
+                        chat_id = str(message.get("chat", {}).get("id", ""))
+                        
+                        if text in ["/start", "/register"] and chat_id:
+                            if chat_id not in self._telegram_registered_chats:
+                                self._telegram_registered_chats.add(chat_id)
+                                logger.info(f"Telegram: New registration from chat_id {chat_id}")
+                                # Send confirmation
+                                self._send_telegram_direct(chat_id, "✅ <b>Registration Successful!</b>\nYou will now receive flood alerts from HydroGuard.")
+                                # Save to config (persists as comma-separated if multiple, for now just update)
+                                self._update_config_telegram_chat(chat_id)
+                elif response.status_code == 401:
+                    logger.error("Telegram: Unauthorized (invalid token). Stopping poll.")
+                    break
+                
+                time.sleep(2)
+            except requests.exceptions.RequestException as e:
+                logger.warning(f"Telegram polling network error: {e}")
+                time.sleep(10)
+            except Exception as e:
+                logger.error(f"Telegram polling error: {e}")
+                time.sleep(10)
+
+    def _send_telegram_direct(self, chat_id, text):
+        """Internal helper to send a direct message."""
+        token = self.config['telegram']['token']
+        try:
+            url = f"https://api.telegram.org/bot{token}/sendMessage"
+            payload = {"chat_id": chat_id, "text": text, "parse_mode": "HTML"}
+            requests.post(url, json=payload, timeout=10)
+        except: pass
+
+    def _update_config_telegram_chat(self, chat_id):
+        """Update config.yaml with the new chat_id."""
+        if not self.config_path:
+            logger.warning("Telegram: Cannot save chat_id, config_path not set")
+            return
+            
+        try:
+            # If multiple chats, store as comma-separated string for simplicity
+            current = self.config['telegram'].get('chat_id', '')
+            if current:
+                chats = set(str(current).split(','))
+                chats.add(str(chat_id))
+                self.config['telegram']['chat_id'] = ','.join(chats)
+            else:
+                self.config['telegram']['chat_id'] = str(chat_id)
+                
+            with open(self.config_path, 'w') as f:
+                import yaml
+                yaml.dump(self.config, f, default_flow_style=False)
+            logger.info(f"Telegram: config.yaml updated with chat_id(s): {self.config['telegram']['chat_id']}")
+        except Exception as e:
+            logger.error(f"Failed to update config with Telegram chat_id: {e}")
 
     def _init_channels(self):
         """Initialize external channels in background (non-blocking)."""
@@ -321,6 +481,21 @@ class AlertManager:
         # Connect ESP32
         if self.config['esp32']['enabled']:
             self._connect_esp32()
+
+        # Start BitChat Bridge
+        self.bitchat_bridge.start()
+        self._channel_status['bitchat'] = True
+
+        # Initial Telegram check
+        if self.config.get('telegram', {}).get('enabled', False):
+            token = self.config['telegram']['token']
+            if token:
+                try:
+                    # Start polling in background
+                    threading.Thread(target=self._telegram_poll_loop, daemon=True).start()
+                    self._channel_status['telegram'] = True
+                except:
+                    self._channel_status['telegram'] = False
 
     # ---- Nostr for Bitchat ----
 
@@ -364,60 +539,146 @@ class AlertManager:
             pubkey = pk.public_key.hex()
 
             created_at = int(time.time())
-            # kind 1 text note
+            nickname = self.config.get('bitchat', {}).get('nickname', 'HYDROGUARD_NODE')
+            
+            # Base tags for BitChat compatibility
             tags = [
                 ["t", "flood_alert"],
                 ["t", "hydroguard"],
                 ["level", LEVEL_NAMES[level]],
-                ["water_cm", str(int(water_level_cm))]
+                ["water_cm", str(int(water_level_cm))],
+                ["n", nickname]  # Critical for BitChat display name
             ]
-            content = f"🌊 HYDROGUARD FLOOD ALERT [{LEVEL_NAMES[level]}]\n\nWater level: {water_level_cm:.0f} cm\n{message}"
-
-            event = Event(public_key=pubkey, content=content, kind=1, created_at=created_at, tags=tags)
-            pk.sign_event(event)
-
-            # Manually extract Enum value if python-nostr uses Enums for EventKind
-            kind_val = event.kind.value if hasattr(event.kind, 'value') else event.kind
             
-            event_dict = {
-                "id": event.id,
-                "pubkey": event.public_key,
-                "created_at": event.created_at,
-                "kind": kind_val,
-                "tags": event.tags,
-                "content": event.content,
-                "sig": event.signature
-            }
+            # Add geohash tag if available (crucial for BitChat "Location" view)
+            geohash = self.config.get('nostr', {}).get('geohash')
+            if geohash:
+                tags.append(["g", geohash])
+                logger.debug(f"Nostr: Added geohash tag: {geohash}")
 
-            relay_msg = json.dumps(["EVENT", event_dict])
-            relays = self.config.get('nostr', {}).get('relays', [])
+            content = f"🌊 HYDROGUARD [ {LEVEL_NAMES[level]} ]\n\nWater level: {water_level_cm:.0f} cm\n{message}"
 
-            success_count = 0
-            for relay_url in relays:
-                try:
-                    ws = ws_client.create_connection(relay_url, timeout=5)
-                    ws.send(relay_msg)
-                    try:
-                        resp = ws.recv()
-                        logger.info(f"Nostr relay {relay_url}: {resp[:120]}")
-                    except Exception:
-                        pass
-                    ws.close()
-                    success_count += 1
-                except Exception as e:
-                    logger.warning(f"Nostr relay {relay_url} failed: {e}")
+            # --- SEND PUBLIC EVENTS ---
+            # 1. Kind 1 (Text Note / Location Note)
+            event1 = Event(public_key=pubkey, content=content, kind=1, created_at=created_at, tags=tags)
+            pk.sign_event(event1)
+            self._publish_event(event1)
 
-            if success_count > 0:
-                logger.info(f"Nostr event published to {success_count}/{len(relays)} relays")
-            else:
-                logger.warning("Nostr: failed to reach any relay")
+            # 2. Kind 20000 (Ephemeral / Geochat) - This is what shows up in the BitChat chat tab
+            event20000 = Event(public_key=pubkey, content=content, kind=20000, created_at=created_at, tags=tags)
+            pk.sign_event(event20000)
+            self._publish_event(event20000)
 
             self._last_alert_time['nostr'] = time.time()
-            self._channel_status['nostr'] = success_count > 0
+            self._channel_status['nostr'] = True
+
+            # --- SEND PRIVATE ALERT TO ADMIN ---
+            admin_npub = self.config.get('nostr', {}).get('admin_npub')
+            if admin_npub:
+                # Note: BitChat app expects NIP-17 (Kind 1059) for private chats.
+                # Kind 4 is sent as a fallback.
+                self._send_nostr_private(pk, admin_npub, f"⚠️ PRIVATE ALERT: {content}")
 
         except Exception as e:
             logger.error(f"Nostr error: {e}")
             self._channel_status['nostr'] = False
+
+    def _send_nostr_private(self, sender_pk, recipient_npub, message):
+        """Send an encrypted private message (Kind 4) to the admin's npub."""
+        try:
+            from nostr.event import Event
+            from nostr.key import PublicKey
+            import bech32
+            
+            # Convert npub to hex
+            decoded = bech32.bech32_decode(recipient_npub)
+            if len(decoded) == 3:
+                hrp, data, spec = decoded
+            else:
+                hrp, data = decoded
+
+            if hrp != 'npub':
+                logger.error(f"Nostr: Invalid NPUB HRP: {hrp}")
+                return
+            
+            pubkey_bytes = bytes(bech32.convertbits(data, 5, 8, False))
+            recipient_pubkey_hex = pubkey_bytes.hex()
+            
+            # Encrypt message (NIP-04)
+            # Use the sender's private key to encrypt for recipient
+            encrypted_content = sender_pk.encrypt_message(message, recipient_pubkey_hex)
+            
+            # Create Event (Kind 4)
+            dm = Event(
+                public_key=sender_pk.public_key.hex(),
+                content=encrypted_content,
+                kind=4,
+                tags=[["p", recipient_pubkey_hex]]
+            )
+            sender_pk.sign_event(dm)
+            
+            self._publish_event(dm)
+            logger.info(f"Nostr: Private alert sent (Kind 4) to {recipient_npub}")
+            
+        except Exception as e:
+            logger.error(f"Nostr Private error: {e}")
+
+    def _nip44_encrypt(self, sender_pk, recipient_pubkey_hex, plaintext):
+        """Perform NIP-44 v2 encryption placeholder."""
+        # TODO: Implement full XChaCha20-Poly1305 if needed
+        return ""
+
+    def _publish_event(self, event):
+        """Internal helper to push an event to configured relays."""
+        import json
+        
+        # Manually extract Enum value if python-nostr uses Enums for EventKind
+        kind_val = event.kind.value if hasattr(event.kind, 'value') else event.kind
+        
+        event_dict = {
+            "id": event.id,
+            "pubkey": event.public_key,
+            "created_at": event.created_at,
+            "kind": kind_val,
+            "tags": event.tags,
+            "content": event.content,
+            "sig": event.signature
+        }
+
+        relay_msg = json.dumps(["EVENT", event_dict])
+        relays = self.config.get('nostr', {}).get('relays', [])
+
+        def push_to_relay(url):
+            try:
+                import websocket as ws_client
+                ws = ws_client.create_connection(url, timeout=5)
+                ws.send(relay_msg)
+                
+                # Wait for response (OK or NOTICE)
+                response = ws.recv()
+                ws.close()
+                
+                if response:
+                    logger.info(f"Nostr: Relay {url} response: {response}")
+                else:
+                    logger.info(f"Nostr: Event sent to {url} (no immediate response)")
+                return True
+            except Exception as e:
+                logger.debug(f"Nostr relay {url} failed: {e}")
+                return False
+
+        threads = []
+        for relay_url in relays:
+            t = threading.Thread(target=push_to_relay, args=(relay_url,), daemon=True)
+            t.start()
+            threads.append(t)
+
+        # Wait briefly for some to finish, but don't block the system
+        # We consider it "sent" if we started the threads
+        self._last_alert_time['nostr'] = time.time()
+        self._channel_status['nostr'] = True
+        logger.info(f"Nostr: Publishing event {event.id[:8]} to {len(relays)} relays...")
+        return True
 
     # ---- ESP32 BLE Beacon ----
 
@@ -498,4 +759,16 @@ class AlertManager:
                 self._serial.close()
             except Exception:
                 pass
+        
+        if self._bitchat_loop:
+            try:
+                self._bitchat_loop.call_soon_threadsafe(self._bitchat_loop.stop)
+            except Exception:
+                pass
+
         logger.info("Alert manager shut down")
+
+    def _send_bitchat(self, message):
+        """Send message through the BitChat bridge."""
+        logger.info(f"BitChat bridge: Broadcasting alert: {message[:50]}...")
+        self.bitchat_bridge.send_message(message)
