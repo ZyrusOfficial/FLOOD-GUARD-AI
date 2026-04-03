@@ -13,7 +13,7 @@ alerts:
 briar:
   enabled: true
   api_url: "http://localhost:7000"
-  api_token: "awKMAuJBv+DVPg8OHaJNOWDZLQzdkLCxWUwH9cru7b4="
+  api_token: ""
   forum_name: "Flood Alerts"
 camera:
   droidcam_ip: 192.168.1.175
@@ -63,9 +63,9 @@ esp32:
   enabled: true
   port: /dev/ttyUSB0
 nostr:
-  admin_npub: npub1k8rstk494pqjy4wsr9xj45a3r4dfwkvmgwhle348705u5pyxxh6qwf7xuz
-  geohash: wdtz2n4
-  private_key: ce7ba6f25e2f59b709c3103b4754aaac1547503ca5e28b5fb6b5113b06c1a118
+  admin_npub: 
+  geohash: 
+  private_key: 
   relays:
   - wss://relay.damus.io
   - wss://nos.lol
@@ -79,6 +79,6 @@ sms:
   recipients:
   - 09763079509
 telegram:
-  chat_id: '8283642133'
+  chat_id: ''
   enabled: true
-  token: 8628224553:AAEPOtbR_sFiNy1xgpUcaucGQQSJCHCM-ZY
+  token: 
